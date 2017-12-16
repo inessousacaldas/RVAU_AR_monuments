@@ -4,7 +4,7 @@ from database import load_database
 from feature_points import *
 from utils import get_image_layerAR
 
-IMAGE_TEST_PATH = '..\database\sample\image.JPG'
+IMAGE_TEST_PATH = '..\database\sample\image.jpg'
 
 
 def image_test(image_test, database_images):
@@ -30,7 +30,7 @@ def image_test(image_test, database_images):
             max_matches = len(matches[i])
             index_max = i
 
-    print('Found %d matches for database image %d' (max_matches, index_max), flush=True)
+    print('Found %d matches for database image %d' % (max_matches, index_max), flush=True)
 
     layerAR = get_image_layerAR(index_max)
     print(layerAR, flush=True)
@@ -41,7 +41,8 @@ def main():
 
     images_cv, feature_points, descriptors = load_database()
     database_images = [images_cv, feature_points, descriptors]
-    
+    print('points', feature_points, flush=True)
+    print('desc', descriptors, flush=True)
     image_test(IMAGE_TEST_PATH, database_images)
 
 

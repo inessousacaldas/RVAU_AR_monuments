@@ -15,6 +15,7 @@ def example():
     kp1, des1 = sift.detectAndCompute(src,None)
     kp2, des2 = sift.detectAndCompute(dst,None)
 
+    print('desc ' , des1)
     FLANN_INDEX_KDTREE = 0
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks = 50)
@@ -110,15 +111,14 @@ def calculate_matches(image_des, database_des):
 
 def compute_homography(test_image, database_image, layerAR, matches):
     #kp_database_image/test_image = [img, kp, des]
-    
     layerAR_img = cv2.imread(layerAR)
 
     database_im = database_image[0]
     
-    kp_test_image = test_image[1]
     kp_database_image = database_image[1]
-
-    print(len(kp_test_image), len(kp_database_image), flush=True)
+    kp_test_image = test_image[1]
+    
+    print(kp_database_image, flush=True)
 
     if len(matches)>MIN_MATCH_COUNT:
         src_pts = np.float32([ kp_database_image[m.queryIdx].pt for m in matches ]).reshape(-1,1,2)
@@ -131,7 +131,7 @@ def compute_homography(test_image, database_image, layerAR, matches):
 
 def calculate_feature_points(image_path):
     
-    print('Calculating feature points for image %s' + image_path, flush=True)
+    print('Calculating feature points for image %s' % image_path, flush=True)
     
     img = cv2.imread(image_path,0) # queryImage
     # Initiate SIFT detector
@@ -141,4 +141,3 @@ def calculate_feature_points(image_path):
     kp1, des1 = sift.detectAndCompute(img,None)
 
     return img, kp1, des1
-
