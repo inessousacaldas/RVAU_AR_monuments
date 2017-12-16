@@ -29,7 +29,7 @@ def image_test(image_test, database_images):
             max_matches = len(matches[i])
             index_max = i
 
-    print('Found %d matches for database image %d' % (max_matches, index_max), flush=True)
+    print('Found %d matches for database image %d' % (max_matches, index_max + 1), flush=True)
 
     layerAR = get_image_layerAR(index_max)
 
