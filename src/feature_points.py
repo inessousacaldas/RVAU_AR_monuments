@@ -14,8 +14,7 @@ def example():
 
     kp1, des1 = sift.detectAndCompute(src,None)
     kp2, des2 = sift.detectAndCompute(dst,None)
-    print(len(kp1), len(des1), flush=True)
-    print(len(kp2), len(des2), flush=True)
+
     FLANN_INDEX_KDTREE = 0
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks = 50)
@@ -28,7 +27,6 @@ def example():
             good.append(m)
     
     if len(good)>MIN_MATCH_COUNT:
-        print('Encontrou', flush=True)
         src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
         dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
 
@@ -37,10 +35,6 @@ def example():
         h,w = dst.shape
 
         result = cv2.warpPerspective(layerAR_img, M,(w,h))
-
-
-
-    print(len(src), len(dst), len(layerAR_img), len(result), flush=True)
 
     merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
     merge_final = cv2.addWeighted(result,0.5,dst,0.5,0)
@@ -108,13 +102,17 @@ def calculate_matches(image_des, database_des):
 
 def compute_homography(test_image, database_image, layerAR, matches):
     #kp_database_image/test_image = [img, kp, des]
-    layerAR_img = cv2.imread(layerAR)
+    layerAR_img = cv2.imread(layerAR, 0)
 
-    database_im = database_image[0]
-    
+    #Images openCV
+    src = database_image[0]
+    dst = test_image[0]
+
+    #Keypoints
     kp_database_image = database_image[1]
     kp_test_image = test_image[1]
 
+    #Descriptors
     des_database_image = database_image[2]
     des_test_image = test_image[2]
     
@@ -124,6 +122,45 @@ def compute_homography(test_image, database_image, layerAR, matches):
 
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,0.6)
         matchesMask = mask.ravel().tolist()
+
+        h,w = dst.shape
+
+        result = cv2.warpPerspective(layerAR_img, M,(w,h))
+
+    merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
+    merge_final = cv2.addWeighted(result,0.5,dst,0.5,0)
+
+    cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
+    cv2.resizeWindow('res', 300, 300)
+    cv2.imshow('res',result)
+
+    cv2.namedWindow('merge_ori', cv2.WINDOW_KEEPRATIO)
+    cv2.resizeWindow('merge_ori', 300, 300)
+    cv2.imshow('merge_ori',merge)
+
+    cv2.namedWindow('merge', cv2.WINDOW_KEEPRATIO)
+    cv2.resizeWindow('merge', 300, 300)
+    cv2.imshow('merge',merge_final)
+
+    cv2.namedWindow('ori', cv2.WINDOW_KEEPRATIO)
+    cv2.resizeWindow('ori', 300, 300)
+    cv2.imshow('ori', dst)
+
+    cv2.namedWindow('test', cv2.WINDOW_KEEPRATIO)
+    cv2.resizeWindow('test', 300, 300)
+    cv2.imshow('test', src)
+
+    draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+                    singlePointColor = None,
+                    matchesMask = matchesMask, # draw only inliers
+                    flags = 2)
+
+    img3 = cv2.drawMatches(src,kp_database_image,dst,kp_test_image,matches,None,**draw_params)
+
+    plt.imshow(img3, 'gray'),plt.show()
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 def calculate_feature_points(image_path):
@@ -136,5 +173,5 @@ def calculate_feature_points(image_path):
    
     # find the keypoints and descriptors with SIFT
     kp1, des1 = sift.detectAndCompute(img,None)
-    print(len(kp1), len(des1))
+
     return img, kp1, des1

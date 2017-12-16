@@ -32,7 +32,7 @@ def image_test(image_test, database_images):
     print('Found %d matches for database image %d' % (max_matches, index_max), flush=True)
 
     layerAR = get_image_layerAR(index_max)
-    print(layerAR, flush=True)
+
     database_image = [database_images[0][index_max], database_images[1][index_max], database_images[2][index_max]]
     compute_homography(image, database_image, layerAR, matches[index_max])
 
@@ -40,7 +40,7 @@ def main():
 
     images_cv, feature_points, descriptors = load_database()
     database_images = [images_cv, feature_points, descriptors]
-    print(len(descriptors[0]), flush=True)
+ 
     image_test(IMAGE_TEST_PATH, database_images)
 
 

@@ -28,7 +28,6 @@ def create_database():
         
         images_cv.append(img)
         feature_points.append(kpt)
-        print(kpt)
         descriptors.append(des)
 
     with open(IMAGES_PATH, 'wb') as fp:
@@ -62,12 +61,13 @@ def load_database():
     with open (FEATURE_POINTS_PATH, 'rb') as fp:
         temp_kp = pickle.load(fp)
     
+    
     feature_points = []
    
     for list_kp in temp_kp:
         temp_feature = unpickle_keypoints(list_kp)
         feature_points.append(temp_feature)
-
-        return images_cv, feature_points, descriptors
+    
+    return images_cv, feature_points, descriptors
     
     
