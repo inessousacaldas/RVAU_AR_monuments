@@ -58,6 +58,9 @@ def test_sift():
 
     return
 
+"""
+Computes matches for des1 (test image) to des2 (database)
+"""
 def compute_matches(des1, des2):
 
     FLANN_INDEX_KDTREE = 0
@@ -77,7 +80,7 @@ def compute_matches(des1, des2):
     return good
 
 def calculate_matches(image_des, database_des):
-
+    print("Calculating matches with database", flush=True)
     matches = []
     for db_des in database_des:
         mat = compute_matches(image_des, db_des)
@@ -85,8 +88,25 @@ def calculate_matches(image_des, database_des):
 
     return matches
 
+
+def compute_homography(test_image, database_image, layerAR, matches):
+    
+    kp_test_image = test_image[1]
+    kp_database_image = database_image[1]
+
+    if len(matches)>MIN_MATCH_COUNT:
+        src_pts = np.float32([ kp_test_image[m.queryIdx].pt for m in matches ]).reshape(-1,1,2)
+        dst_pts = np.float32([ kp_database_image[m.trainIdx].pt for m in matches ]).reshape(-1,1,2)
+
+        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+        matchesMask = mask.ravel().tolist()
+
+        im_dst = cv2.warpPerspective(im_src, h, size)
+
 def calculate_feature_points(image_path):
-   
+    
+    print('Calculating feature points for image %s' + image_path, flush=True)
+    
     img = cv2.imread(image_path,0) # queryImage
     # Initiate SIFT detector
     sift = cv2.xfeatures2d.SIFT_create()

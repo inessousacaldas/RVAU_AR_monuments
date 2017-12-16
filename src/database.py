@@ -12,7 +12,7 @@ FEATURE_POINTS_PATH = '..\database\Feature_points'
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
 def create_database():
     image_list = []
-    for filename in glob.glob(DATABASE_PATH): #assuming png
+    for filename in glob.glob(DATABASE_PATH):
         im=Image.open(filename)
         image_list.append(filename)
 
@@ -37,6 +37,8 @@ def create_database():
         pickle.dump(descriptors, fp)
 
 def load_database():
+
+    print("Loading database...", flush=True)
 
     #Create database if not exist
     if os.path.isfile(IMAGES_PATH) == False | os.path.isfile(DESCRIPTORS_PATH) == False | os.path.isfile(FEATURE_POINTS_PATH) == False:
