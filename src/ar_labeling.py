@@ -6,14 +6,13 @@ from utils import get_image_layerAR
 
 IMAGE_TEST_PATH = '..\database\sample\image.jpg'
 
-
 def image_test(image_test, database_images):
     
     #Calculates feature points for test image
     img, kp, des = calculate_feature_points(image_test)
 
     image = [img, kp, des]
-
+    
     #Calculates matches of image test with all images from database
     matches = calculate_matches(des, database_images[2])
 
@@ -41,8 +40,7 @@ def main():
 
     images_cv, feature_points, descriptors = load_database()
     database_images = [images_cv, feature_points, descriptors]
-    print('points', feature_points, flush=True)
-    print('desc', descriptors, flush=True)
+    print(len(descriptors[0]), flush=True)
     image_test(IMAGE_TEST_PATH, database_images)
 
 

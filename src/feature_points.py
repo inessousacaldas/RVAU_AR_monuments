@@ -14,8 +14,8 @@ def example():
 
     kp1, des1 = sift.detectAndCompute(src,None)
     kp2, des2 = sift.detectAndCompute(dst,None)
-
-    print('desc ' , des1)
+    print(len(kp1), len(des1), flush=True)
+    print(len(kp2), len(des2), flush=True)
     FLANN_INDEX_KDTREE = 0
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks = 50)
@@ -27,7 +27,6 @@ def example():
         if m.distance < 0.7*n.distance:
             good.append(m)
     
-    print(len(good), flush=True)
     if len(good)>MIN_MATCH_COUNT:
         print('Encontrou', flush=True)
         src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
@@ -38,6 +37,8 @@ def example():
         h,w = dst.shape
 
         result = cv2.warpPerspective(layerAR_img, M,(w,h))
+
+
 
     print(len(src), len(dst), len(layerAR_img), len(result), flush=True)
 
@@ -86,12 +87,9 @@ def compute_matches(des1, des2):
     FLANN_INDEX_KDTREE = 0
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks = 50)
-
     flann = cv2.FlannBasedMatcher(index_params, search_params)
-
     matches = flann.knnMatch(des1,des2,k=2)
 
-    # store all the good matches as per Lowe's ratio test.
     good = []
     for m,n in matches:
         if m.distance < 0.7*n.distance:
@@ -103,11 +101,10 @@ def calculate_matches(image_des, database_des):
     print("Calculating matches with the database images", flush=True)
     matches = []
     for db_des in database_des:
-        mat = compute_matches(image_des, db_des)
+        mat = compute_matches(db_des, image_des)
         matches.append(mat)
 
     return matches
-
 
 def compute_homography(test_image, database_image, layerAR, matches):
     #kp_database_image/test_image = [img, kp, des]
@@ -117,16 +114,16 @@ def compute_homography(test_image, database_image, layerAR, matches):
     
     kp_database_image = database_image[1]
     kp_test_image = test_image[1]
-    
-    print(kp_database_image, flush=True)
 
-    if len(matches)>MIN_MATCH_COUNT:
+    des_database_image = database_image[2]
+    des_test_image = test_image[2]
+    
+    if len(matches) > MIN_MATCH_COUNT:
         src_pts = np.float32([ kp_database_image[m.queryIdx].pt for m in matches ]).reshape(-1,1,2)
         dst_pts = np.float32([ kp_test_image[m.trainIdx].pt for m in matches ]).reshape(-1,1,2)
 
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,0.6)
         matchesMask = mask.ravel().tolist()
-
 
 
 def calculate_feature_points(image_path):
@@ -139,5 +136,5 @@ def calculate_feature_points(image_path):
    
     # find the keypoints and descriptors with SIFT
     kp1, des1 = sift.detectAndCompute(img,None)
-
+    print(len(kp1), len(des1))
     return img, kp1, des1
