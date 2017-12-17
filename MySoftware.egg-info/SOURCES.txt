@@ -1,0 +1,12 @@
+setup.py
+MySoftware.egg-info/PKG-INFO
+MySoftware.egg-info/SOURCES.txt
+MySoftware.egg-info/dependency_links.txt
+MySoftware.egg-info/top_level.txt
+gui/__init__.py
+gui/test.py
+src/__init__.py
+src/ar_labeling.py
+src/database.py
+src/feature_points.py
+src/utils.py
