@@ -33,11 +33,11 @@ def calculate_matches(image_des, database_des):
     return matches
 
 def compute_homography(test_image, database_image, layerAR, matches):
-    print('Entrei', flush=True)
+
     #kp_database_image/test_image = [img, kp, des]
     layerAR_img = cv2.imread(layerAR, cv2.IMREAD_GRAYSCALE)
-    coloredLayerAr = cv2.imread(layerAR,-1)
-    #coloredTestImage = cv2.imread(NOIMREADSAMPLE,1)
+    coloredLayerAr = cv2.imread(layerAR, -1)
+    dst_rgb = cv2.imread(NOIMREADSAMPLE, cv2.IMREAD_COLOR)
     
     #Images openCV
     src = database_image[0]
@@ -62,16 +62,12 @@ def compute_homography(test_image, database_image, layerAR, matches):
 
         result = cv2.warpPerspective(coloredLayerAr, M,(w,h))
 
-    
-    print("WWWWWWW", result.shape, dst.shape, flush=True)
+    #TODO
     #merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
-    #result_rgb = result.copy()
-    #dst_rgb = dst.copy()
-    #result_rgb = cv2.cvtColor(result,cv2.COLOR_GRAY2RGB)
-    dst_rgb = cv2.cvtColor(dst,cv2.COLOR_GRAY2RGB)
-    #merge_final = cv2.addWeighted(result_rgb,0.5,dst_rgb,0.5,0)
-    merge_final = blend_transparent(dst_rgb, result)
-    print("WWW_rgb", result.shape, dst_rgb.shape, flush=True)
+    print("Anda la ", flush = True)
+    
+    merge_final = blend_transparent(dst, result)
+
     cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('res', 300, 300)
     cv2.imshow('res',result)
@@ -81,6 +77,7 @@ def compute_homography(test_image, database_image, layerAR, matches):
     cv2.resizeWindow('merge_ori', 300, 300)
     cv2.imshow('merge_ori',merge)
     """
+
     cv2.namedWindow('merge', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('merge', 300, 300)
     cv2.imshow('merge',merge_final)
