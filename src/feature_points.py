@@ -3,76 +3,8 @@ import cv2
 from matplotlib import pyplot as plt
 
 MIN_MATCH_COUNT = 15
-
-def example():
-
-    src = cv2.imread('..\database\images\img1_01.jpg',0)          # queryImage
-    dst = cv2.imread('..\database\sample\image.jpg',0) # trainImage
-    layerAR_img = cv2.imread('..\database\layers\img1_01_layer.png', 0)
-
-    sift = cv2.xfeatures2d.SIFT_create()
-
-    kp1, des1 = sift.detectAndCompute(src,None)
-    kp2, des2 = sift.detectAndCompute(dst,None)
-
-    FLANN_INDEX_KDTREE = 0
-    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-    search_params = dict(checks = 50)
-    flann = cv2.FlannBasedMatcher(index_params, search_params)
-    matches = flann.knnMatch(des1,des2,k=2)
-
-    good = []
-    for m,n in matches:
-        if m.distance < 0.7*n.distance:
-            good.append(m)
-    
-    if len(good)>MIN_MATCH_COUNT:
-        src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
-        dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
-
-        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 0.6)
-        matchesMask = mask.ravel().tolist()
-        h,w = dst.shape
-
-        result = cv2.warpPerspective(layerAR_img, M,(w,h))
-
-    merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
-    merge_final = cv2.addWeighted(result,0.5,dst,0.5,0)
-
-    cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
-    cv2.resizeWindow('res', 300, 300)
-    cv2.imshow('res',result)
-
-    cv2.namedWindow('merge_ori', cv2.WINDOW_KEEPRATIO)
-    cv2.resizeWindow('merge_ori', 300, 300)
-    cv2.imshow('merge_ori',merge)
-
-
-    cv2.namedWindow('merge', cv2.WINDOW_KEEPRATIO)
-    cv2.resizeWindow('merge', 300, 300)
-    cv2.imshow('merge',merge_final)
-
-    cv2.namedWindow('ori', cv2.WINDOW_KEEPRATIO)
-    cv2.resizeWindow('ori', 300, 300)
-    cv2.imshow('ori', dst)
-
-
-    cv2.namedWindow('test', cv2.WINDOW_KEEPRATIO)
-    cv2.resizeWindow('test', 300, 300)
-    cv2.imshow('test', src)
-
-    draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-                    singlePointColor = None,
-                    matchesMask = matchesMask, # draw only inliers
-                    flags = 2)
-
-    img3 = cv2.drawMatches(src,kp1,dst,kp2,good,None,**draw_params)
-
-    plt.imshow(img3, 'gray'),plt.show()
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
+NOIMREADDATABASE = None
+NOIMREADSAMPLE = None
 """
 Computes matches for des1 (test image) to des2 (database)
 """
@@ -103,6 +35,9 @@ def calculate_matches(image_des, database_des):
 def compute_homography(test_image, database_image, layerAR, matches):
     #kp_database_image/test_image = [img, kp, des]
     layerAR_img = cv2.imread(layerAR, 0)
+    coloredLayerAr = cv2.imread(layerAR,1)
+    coloredTestImage = cv2.imread(NOIMREADSAMPLE,1)
+	
 
     #Images openCV
     src = database_image[0]
@@ -125,10 +60,10 @@ def compute_homography(test_image, database_image, layerAR, matches):
 
         h,w = dst.shape
 
-        result = cv2.warpPerspective(layerAR_img, M,(w,h))
+        result = cv2.warpPerspective(coloredLayerAr, M,(w,h))
 
     merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
-    merge_final = cv2.addWeighted(result,0.5,dst,0.5,0)
+    merge_final = cv2.addWeighted(result,0.5,coloredTestImage,0.5,0)
 
     cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('res', 300, 300)

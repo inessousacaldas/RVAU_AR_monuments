@@ -1,8 +1,9 @@
 from PIL import Image
 
-from src.database import load_database
+from database import load_database
 from feature_points import *
 from utils import get_image_layerAR
+from feature_points import *
 
 IMAGE_TEST_PATH = '..\database\sample\image.jpg'
 
@@ -29,10 +30,12 @@ def image_test(image_test, database_images):
             max_matches = len(matches[i])
             index_max = i
 
-    print('Found %d matches for database image %d' % (max_matches, index_max + 1), flush=True)
+    print('Found %d matches for database image %d' % (max_matches, index_max), flush=True)
 
     layerAR = get_image_layerAR(index_max)
-
+	
+    NOIMREADSAMPLE = image_test
+    print('sample %s databas %s' % (NOIMREADSAMPLE, NOIMREADDATABASE), flush=True)
     database_image = [database_images[0][index_max], database_images[1][index_max], database_images[2][index_max]]
     compute_homography(image, database_image, layerAR, matches[index_max])
 
