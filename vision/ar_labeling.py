@@ -35,7 +35,7 @@ def image_test(image_test, database_images):
     layerAR = get_image_layerAR(index_max)
 	
     NOIMREADSAMPLE = image_test
-    print('sample %s databas %s' % (NOIMREADSAMPLE, NOIMREADDATABASE), flush=True)
+
     database_image = [database_images[0][index_max], database_images[1][index_max], database_images[2][index_max]]
     compute_homography(image, database_image, layerAR, matches[index_max])
 

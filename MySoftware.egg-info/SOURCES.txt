@@ -4,7 +4,6 @@ MySoftware.egg-info/SOURCES.txt
 MySoftware.egg-info/dependency_links.txt
 MySoftware.egg-info/top_level.txt
 gui/__init__.py
-gui/drawer.py
 gui/test.py
 vision/__init__.py
 vision/ar_labeling.py

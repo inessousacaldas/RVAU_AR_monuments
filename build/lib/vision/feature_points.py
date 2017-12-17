@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
-
+from vision.utils import blend_transparent
 MIN_MATCH_COUNT = 15
 NOIMREADDATABASE = None
 NOIMREADSAMPLE = None
@@ -33,12 +33,12 @@ def calculate_matches(image_des, database_des):
     return matches
 
 def compute_homography(test_image, database_image, layerAR, matches):
+    print('Entrei', flush=True)
     #kp_database_image/test_image = [img, kp, des]
-    layerAR_img = cv2.imread(layerAR, 0)
-    coloredLayerAr = cv2.imread(layerAR,1)
-    coloredTestImage = cv2.imread(NOIMREADSAMPLE,1)
-	
-
+    layerAR_img = cv2.imread(layerAR, cv2.IMREAD_GRAYSCALE)
+    coloredLayerAr = cv2.imread(layerAR,-1)
+    #coloredTestImage = cv2.imread(NOIMREADSAMPLE,1)
+    
     #Images openCV
     src = database_image[0]
     dst = test_image[0]
@@ -62,17 +62,25 @@ def compute_homography(test_image, database_image, layerAR, matches):
 
         result = cv2.warpPerspective(coloredLayerAr, M,(w,h))
 
-    merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
-    merge_final = cv2.addWeighted(result,0.5,coloredTestImage,0.5,0)
-
+    
+    print("WWWWWWW", result.shape, dst.shape, flush=True)
+    #merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
+    #result_rgb = result.copy()
+    #dst_rgb = dst.copy()
+    #result_rgb = cv2.cvtColor(result,cv2.COLOR_GRAY2RGB)
+    dst_rgb = cv2.cvtColor(dst,cv2.COLOR_GRAY2RGB)
+    #merge_final = cv2.addWeighted(result_rgb,0.5,dst_rgb,0.5,0)
+    merge_final = blend_transparent(dst_rgb, result)
+    print("WWW_rgb", result.shape, dst_rgb.shape, flush=True)
     cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('res', 300, 300)
     cv2.imshow('res',result)
 
+    """
     cv2.namedWindow('merge_ori', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('merge_ori', 300, 300)
     cv2.imshow('merge_ori',merge)
-
+    """
     cv2.namedWindow('merge', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('merge', 300, 300)
     cv2.imshow('merge',merge_final)
@@ -97,12 +105,11 @@ def compute_homography(test_image, database_image, layerAR, matches):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-
 def calculate_feature_points(image_path):
     
     print('Calculating feature points for image %s' % image_path, flush=True)
     
-    img = cv2.imread(image_path,0) # queryImage
+    img = cv2.imread(image_path,cv2.IMREAD_GRAYSCALE) # queryImage
     # Initiate SIFT detector
     sift = cv2.xfeatures2d.SIFT_create()
    
