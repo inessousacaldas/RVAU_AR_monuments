@@ -2,5 +2,5 @@ from setuptools import setup
 
 
 setup(name='MySoftware',
-     packages=['gui', 'src']
+     packages=['gui', 'vision']
 )

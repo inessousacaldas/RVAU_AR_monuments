@@ -1,10 +1,10 @@
 from PIL import Image
 import glob
-from feature_points import calculate_feature_points
+from vision.feature_points import calculate_feature_points
 import pickle
 import cv2
 import os.path
-from utils import pickle_keypoints, unpickle_keypoints
+from vision.utils import pickle_keypoints, unpickle_keypoints
 
 
 DATABASE_PATH = '..\database\images\*.jpg'

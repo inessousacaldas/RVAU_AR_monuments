@@ -1,0 +1,2 @@
+https://kivy.org/docs/installation/installation-windows.html#install-win-dist
+https://kivy.org/docs/api-kivy.garden.html#

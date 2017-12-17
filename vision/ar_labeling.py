@@ -1,9 +1,9 @@
 from PIL import Image
 
-from database import load_database
-from feature_points import *
-from utils import get_image_layerAR
-from feature_points import *
+from vision.database import load_database
+from vision.feature_points import *
+from vision.utils import get_image_layerAR
+from vision.feature_points import *
 
 IMAGE_TEST_PATH = '..\database\sample\image.jpg'
 
