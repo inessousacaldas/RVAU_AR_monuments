@@ -3,8 +3,7 @@ import cv2
 from matplotlib import pyplot as plt
 from vision.utils import blend_transparent
 MIN_MATCH_COUNT = 15
-NOIMREADDATABASE = None
-NOIMREADSAMPLE = None
+
 """
 Computes matches for des1 (test image) to des2 (database)
 """
@@ -32,13 +31,13 @@ def calculate_matches(image_des, database_des):
 
     return matches
 
-def compute_homography(test_image, database_image, layerAR, matches):
+def compute_homography(test_image_path, test_image, database_image, layerAR, matches):
 
     #kp_database_image/test_image = [img, kp, des]
-    layerAR_img = cv2.imread(layerAR, cv2.IMREAD_GRAYSCALE)
-    coloredLayerAr = cv2.imread(layerAR, IMREAD_UNCHANGED)
-    dst_rgb = cv2.imread(NOIMREADSAMPLE, cv2.IMREAD_COLOR)
-    
+    layerAR_img = cv2.imread(layerAR, 0)
+    coloredLayerAr = cv2.imread(layerAR, -1)
+    dst_rgb = cv2.imread(test_image_path, 1)
+
     #Images openCV
     src = database_image[0]
     dst = test_image[0]
@@ -64,9 +63,8 @@ def compute_homography(test_image, database_image, layerAR, matches):
 
     #TODO
     #merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
-    print("Anda la ", flush = True)
     
-    merge_final = blend_transparent(dst, result)
+    merge_final = blend_transparent(dst_rgb, result)
 
     cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('res', 300, 300)

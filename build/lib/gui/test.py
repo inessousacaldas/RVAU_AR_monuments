@@ -3,7 +3,7 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.graphics import Color, Ellipse, Line
-from src.ar_labeling import example
+from vision.ar_labeling import *
 
 class MyPaintWidget(Widget):
 
