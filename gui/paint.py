@@ -210,7 +210,7 @@ class Paint:
             
             #Buttons
             Buttonframe = Frame(ParentFrame,border=5)
-            Buttonframe.grid(row=0, column=1)
+            Buttonframe.grid(row=0, column=1, sticky="NW")
             Label(Buttonframe,text="tools",border=10).pack()
             Button(Buttonframe,text="Eraser",relief=GROOVE,width=20,command=lambda:self.tools("eraser")).pack()
             Button(Buttonframe,text="Pencil",relief=GROOVE,width=20,command=lambda:self.tools("pencil")).pack()
@@ -221,13 +221,13 @@ class Paint:
             #Tools info
             Label(Buttonframe,text="tools",border=10).pack()
             WeightPencil = Frame(Buttonframe)
-            #WeightPencil.grid(row=0, column=1)
+            WeightPencil.pack()
             self.infoWeightPencil = Label(WeightPencil,text=str(self.toolWeight),border=3,font=10,width=2)
             self.infoWeightPencil.pack(side=LEFT)
             Label(WeightPencil,text="  ").pack(side=LEFT)
             Button(WeightPencil,text="Weight",relief=GROOVE,command=self.toolWeightChange,width=9).pack()
             PencilStyle = Frame(Buttonframe)
-            #PencilStyle.pack()
+            PencilStyle.pack()
             Label(PencilStyle,text=" ",border=3,font=10,width=2).pack(side=LEFT)
             Label(PencilStyle,text="  ").pack(side=LEFT)
             Button(PencilStyle,text="Style",relief=GROOVE,command=self.styleToolChange,width=9).pack()
@@ -235,25 +235,25 @@ class Paint:
             #Color Information
             Label(Buttonframe,text="Colors",border=10).pack()
             activeColor = Frame(Buttonframe)
-            #activeColor.pack()
+            activeColor.pack()
             self.infoactivedcolor = Canvas(activeColor,width=30,height=20,bg=self.activeColor)
             self.infoactivedcolor.pack(side=LEFT)
-            Button(activeColor,text="Main Color",relief=FLAT,command=lambda:self.colorChange("active"),width=10).pack()
+            Button(activeColor,text="Tool",relief=FLAT,command=lambda:self.colorChange("active"),width=10).pack()
             activeColor = Frame(Buttonframe)
-            #activeColor.pack()
+            activeColor.pack()
             self.infoactivedbackgroundcolor = Canvas(activeColor,width=30,height=20,bg=self.backgroundColor)
             self.infoactivedbackgroundcolor.pack(side=LEFT)
-            Button(activeColor,text="Background Color",relief=FLAT,command=lambda:self.colorChange("background"),width=10).pack()
+            Button(activeColor,text="Background",relief=FLAT,command=lambda:self.colorChange("background"),width=10).pack()
             activeColor = Frame(Buttonframe)
-            #activeColor.pack()
+            activeColor.pack()
             self.infoactivedcoloreraser = Canvas(activeColor,width=30,height=20,bg=self.eraserColor)
             self.infoactivedcoloreraser.pack(side=LEFT)
-            Button(activeColor,text="Eraser Color ",relief=FLAT,command=lambda:self.colorChange("eraser"),width=10).pack()
+            Button(activeColor,text="Eraser",relief=FLAT,command=lambda:self.colorChange("eraser"),width=10).pack()
 
             #Info for user
             Label(Buttonframe,height=1).pack()
             self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=10,justify=CENTER,wraplength=125)
-            #self.messageUser.pack()
+            self.messageUser.pack()
 
             #Init functions indev
             self.tools(self.activeTool)
@@ -310,7 +310,6 @@ class Paint:
 
     #New image
     def newImage(self,i="null"):
-        print("A guardar it", flush=True)
         if self.draw:
             resp = pyv("Save",DATAICONS+"alert.ico","save",(250,80))
             resp.root.mainloop(1)
@@ -328,23 +327,37 @@ class Paint:
             txt = pyv("Save",DATAICONS+"save.ico","savefile",(250,110))
             txt.root.mainloop(1)
             print(txt.value, flush=True)
+            
             if txt.value!=0:
                 filename = DATASAVES+str(txt.value)+DEFAULT_EXTENSION
-                
-                
+        
                 self.screenSave.postscript(file=filename, colormode='color')
 
                 img = Image.open(filename)
+                self.saveLayer(img)
                 img.save(DATASAVES+str(txt.value) + '.png', 'png')
                 self.draw = False
-                
+
             else:
                 filename = DATASAVES+DEFAULT_TITLE+DEFAULT_EXTENSION
                 self.screenSave.postscript(file=filename)
                 img = Image.open(filename)
                 img.save(DATASAVES+str(txt.value) + '.png', 'png')
                 self.draw = False
-                self.draw = False
+                self.saveLayer(img)
+                
+
+    def saveLayer(self, img):
+        img = img.convert("RGBA")
+        datas = img.getdata()
+        newData = []
+        for item in datas:
+            if item[0] == 255 and item[1] == 255 and item[2] == 255:
+                newData.append((255, 255, 255, 0))
+            else:
+                newData.append(item)
+        img.putdata(newData)
+        img.save("TransparentImage.png", "PNG")#converted Image name
 
     #exit the program
     def exit(self,i="null"):
