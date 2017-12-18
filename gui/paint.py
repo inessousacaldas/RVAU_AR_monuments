@@ -27,7 +27,7 @@ PROGRAM_TITLE = "MonumentAR"
 CONFIGURATION_FILE = PROGRAM_TITLE+".ini"
 
 #Default configuration
-C_DATA = [[800,500],"#000000","#FFFFFF","#FFFFFF",[5,5,[1,1],0,"miter"],20,3,"EN"]
+C_DATA = [[1024, 768],"#000000","#FFFFFF","#FFFFFF",[5,5,[1,1],0,"miter"],20,3,"EN"]
 
 #Load Settings and Update C_DATA
 try:
@@ -107,6 +107,7 @@ class Paint:
             #Window Creation
             self.main = Tk()
             self.main.focus_force()
+            print(PROGRAM_SIZE)
             self.main.geometry('%dx%d+%d+%d' % (PROGRAM_SIZE[0], PROGRAM_SIZE[1], (self.main.winfo_screenwidth() - PROGRAM_SIZE[0])/2,\
                                                  (self.main.winfo_screenheight() - PROGRAM_SIZE[1])/2))
             self.main.title(PROGRAM_TITLE)
@@ -445,7 +446,13 @@ class Paint:
                 self.mainArchive=filepath
                 print(filepath, flush=True)
 
-                image = ImageTk.PhotoImage(file = filepath)
+                image = Image.open(filepath)
+
+                image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
+                image = ImageTk.PhotoImage(image)
+                
+                #width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1]
+
                 self.screen.create_image(0, 0, image = image, anchor = NW)
                 self.main.mainloop(0)
 
