@@ -3,6 +3,7 @@ from pyv import *
 from PIL import ImageTk, Image
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import pickle
 
 #Funciones intrinsecas de Paint
 def isNumerable(x):
@@ -183,19 +184,33 @@ class Paint:
 
             #Draw Frame
             ParentFrame = Frame(self.main)
-            ParentFrame.pack()
+            ParentFrame.grid()
 
             #Draw Canvas
             windowFrame = Frame(ParentFrame)
-            windowFrame.pack(side=LEFT)
+            #windowFrame.pack(side=LEFT)
+            windowFrame.grid_rowconfigure(0, weight=1)
+            windowFrame.grid_columnconfigure(0, weight=1)
+            windowFrame.grid(row=0, column=0, sticky="nsew")
+            windowFrame2 = Frame(ParentFrame)
+            #windowFrame2.pack()
+            windowFrame2.grid_rowconfigure(0, weight=1)
+            windowFrame2.grid_columnconfigure(0, weight=1)
+            windowFrame2.grid(row=0, column=0, sticky="nsew")
 
-            self.screen = Canvas(windowFrame,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND)
+            windowFrame2.lower()
             
-            self.screen.pack(expand = YES, fill = BOTH)
-
+            self.screen = Canvas(windowFrame,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND)
+            self.screenSave = Canvas(windowFrame2,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND, relief="sunken")
+            
+            self.screen.grid()
+            self.screenSave.grid()
+            #self.screen.pack(expand = YES, fill = BOTH)
+            #self.screenSave.pack(expand = YES, fill = BOTH)
+            
             #Buttons
             Buttonframe = Frame(ParentFrame,border=5)
-            Buttonframe.pack()
+            Buttonframe.grid(row=0, column=1)
             Label(Buttonframe,text="tools",border=10).pack()
             Button(Buttonframe,text="Eraser",relief=GROOVE,width=20,command=lambda:self.tools("eraser")).pack()
             Button(Buttonframe,text="Pencil",relief=GROOVE,width=20,command=lambda:self.tools("pencil")).pack()
@@ -206,13 +221,13 @@ class Paint:
             #Tools info
             Label(Buttonframe,text="tools",border=10).pack()
             WeightPencil = Frame(Buttonframe)
-            WeightPencil.pack()
+            #WeightPencil.grid(row=0, column=1)
             self.infoWeightPencil = Label(WeightPencil,text=str(self.toolWeight),border=3,font=10,width=2)
             self.infoWeightPencil.pack(side=LEFT)
             Label(WeightPencil,text="  ").pack(side=LEFT)
             Button(WeightPencil,text="Weight",relief=GROOVE,command=self.toolWeightChange,width=9).pack()
             PencilStyle = Frame(Buttonframe)
-            PencilStyle.pack()
+            #PencilStyle.pack()
             Label(PencilStyle,text=" ",border=3,font=10,width=2).pack(side=LEFT)
             Label(PencilStyle,text="  ").pack(side=LEFT)
             Button(PencilStyle,text="Style",relief=GROOVE,command=self.styleToolChange,width=9).pack()
@@ -220,17 +235,17 @@ class Paint:
             #Color Information
             Label(Buttonframe,text="Colors",border=10).pack()
             activeColor = Frame(Buttonframe)
-            activeColor.pack()
+            #activeColor.pack()
             self.infoactivedcolor = Canvas(activeColor,width=30,height=20,bg=self.activeColor)
             self.infoactivedcolor.pack(side=LEFT)
             Button(activeColor,text="Main Color",relief=FLAT,command=lambda:self.colorChange("active"),width=10).pack()
             activeColor = Frame(Buttonframe)
-            activeColor.pack()
+            #activeColor.pack()
             self.infoactivedbackgroundcolor = Canvas(activeColor,width=30,height=20,bg=self.backgroundColor)
             self.infoactivedbackgroundcolor.pack(side=LEFT)
             Button(activeColor,text="Background Color",relief=FLAT,command=lambda:self.colorChange("background"),width=10).pack()
             activeColor = Frame(Buttonframe)
-            activeColor.pack()
+            #activeColor.pack()
             self.infoactivedcoloreraser = Canvas(activeColor,width=30,height=20,bg=self.eraserColor)
             self.infoactivedcoloreraser.pack(side=LEFT)
             Button(activeColor,text="Eraser Color ",relief=FLAT,command=lambda:self.colorChange("eraser"),width=10).pack()
@@ -238,7 +253,7 @@ class Paint:
             #Info for user
             Label(Buttonframe,height=1).pack()
             self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=10,justify=CENTER,wraplength=125)
-            self.messageUser.pack()
+            #self.messageUser.pack()
 
             #Init functions indev
             self.tools(self.activeTool)
@@ -247,9 +262,10 @@ class Paint:
             #Window is created
             self.main.mainloop(0)
 
-        except:
-            lib("error","kernel",[2])
-            lib("error","kernel",[3])
+        except ValueError:
+            print(ValueError)
+            #lib("error","kernel",[2])
+            #lib("error","kernel",[3])
 
     #Free draw
     def freeDraw(self,event):
@@ -263,26 +279,40 @@ class Paint:
             self.screen.create_line(event.x,event.y,self.befpoint[0]+self.toolStyle[0]-DEFAULT_TOOL_STYLE[0],self.befpoint[1]+\
                                   self.toolStyle[1]-DEFAULT_TOOL_STYLE[1], dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,smooth=self.toolStyle[3])
+            self.screenSave.create_line(event.x,event.y,self.befpoint[0]+self.toolStyle[0]-DEFAULT_TOOL_STYLE[0],self.befpoint[1]+\
+                                  self.toolStyle[1]-DEFAULT_TOOL_STYLE[1], dash=self.toolStyle[2],\
+                                  width=self.toolWeight,fill=colorpaint,smooth=self.toolStyle[3])
             self.befpoint = [event.x,event.y]
         else:
             if self.activeTool==3:
+                self.screenSave.create_rectangle(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+                                  self.toolStyle[1],dash=self.toolStyle[2],\
+                                  width=self.toolWeight,fill=colorpaint,outline = colorpaint)
                 self.screen.create_rectangle(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,outline = colorpaint)
+                                 
             elif self.activeTool==4:
                 self.screen.create_oval(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+                                  self.toolStyle[1],dash=self.toolStyle[2],\
+                                  width=self.toolWeight,fill=colorpaint,outline = colorpaint)
+                self.screenSave.create_oval(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,outline = colorpaint)
             else:
                 self.screen.create_line(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,smooth=self.toolStyle[3])
+                self.screenSave.create_line(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+                                  self.toolStyle[1],dash=self.toolStyle[2],\
+                                  width=self.toolWeight,fill=colorpaint,smooth=self.toolStyle[3])
         self.draw = True
 
     #New image
     def newImage(self,i="null"):
+        print("A guardar it", flush=True)
         if self.draw:
-            resp = pyv("Save",DATAICONS+"alert.ico","saveIt",(250,80))
+            resp = pyv("Save",DATAICONS+"alert.ico","save",(250,80))
             resp.root.mainloop(1)
             if resp.value!=0:
                 if resp.value: self.saveImage()
@@ -294,13 +324,26 @@ class Paint:
     def saveImage(self,i="null"):
         if self.draw:
             self.screen.update()
-            txt = pyv("Save",DATAICONS+"save.ico","save",(250,110))
+            self.screenSave.update()
+            txt = pyv("Save",DATAICONS+"save.ico","savefile",(250,110))
             txt.root.mainloop(1)
+            print(txt.value, flush=True)
             if txt.value!=0:
-                self.screen.postscript(file=DATASAVES+str(txt.value)+DEFAULT_EXTENSION)
+                filename = DATASAVES+str(txt.value)+DEFAULT_EXTENSION
+                
+                
+                self.screenSave.postscript(file=filename, colormode='color')
+
+                img = Image.open(filename)
+                img.save(DATASAVES+str(txt.value) + '.png', 'png')
                 self.draw = False
+                
             else:
-                self.screen.postscript(file=DATASAVES+DEFAULT_TITLE+DEFAULT_EXTENSION)
+                filename = DATASAVES+DEFAULT_TITLE+DEFAULT_EXTENSION
+                self.screenSave.postscript(file=filename)
+                img = Image.open(filename)
+                img.save(DATASAVES+str(txt.value) + '.png', 'png')
+                self.draw = False
                 self.draw = False
 
     #exit the program
@@ -369,12 +412,15 @@ class Paint:
             if self.activeFigure==1:
                 self.screen.create_rectangle(self.pos[0][0],self.pos[0][1],self.pos[1][0],self.pos[1][1],\
                                                fill=self.backgroundColor,outline=self.activeColor)
+                
             if self.activeFigure==2:
                 self.screen.create_oval(self.pos[0][0],self.pos[0][1],self.pos[1][0],self.pos[1][1],\
                                           fill=self.backgroundColor,outline=self.activeColor)
+                
             if self.activeFigure==3:
                 self.screen.create_line(self.pos[0][0],self.pos[0][1],self.pos[1][0],self.pos[1][1],\
                                           fill=self.backgroundColor,width=self.toolWeight)
+        
             if self.activeFigure==5:
                 a = pyv("Crear arco",DATAICONS+"arc.ico","arco",(260,115))
                 self.messageUser.config(text="Ingrese los grados de su arco, 0 para cancelar")
@@ -446,14 +492,13 @@ class Paint:
                 self.mainArchive=filepath
                 print(filepath, flush=True)
 
+                self.imageBackgroundPath = filepath
                 image = Image.open(filepath)
-
                 image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
                 image = ImageTk.PhotoImage(image)
                 
-                #width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1]
-
-                self.screen.create_image(0, 0, image = image, anchor = NW)
+                self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
+                
                 self.main.mainloop(0)
 
         if figura =="polygn":

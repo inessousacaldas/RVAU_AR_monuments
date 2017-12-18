@@ -531,12 +531,12 @@ class pyv:
             self.texto.focus_force()
             
         #Menu insertar figura
-        if type_win=="guardar":
-            Label(self.root,text="Escoja un nombre",font=DEFAULT_FONT_TITLE,border=10).pack()
+        if type_win=="savefile":
+            Label(self.root,text="Choose name",font=DEFAULT_FONT_TITLE,border=10).pack()
             self.texto = Entry(self.root)
             self.texto.pack()
             Label(self.root,text=" ").pack()
-            Button(self.root, text="Guardar",command=self.enviarTexto,width=10,relief=GROOVE).pack()
+            Button(self.root, text="Save",command=self.enviarTexto,width=10,relief=GROOVE).pack()
             self.texto.focus_force()
             
         #Menu numero de vertices
@@ -558,12 +558,12 @@ class pyv:
             self.arc.focus_force()
         
         #Menu numero de vertices
-        if type_win=="deseaGuardar":
+        if type_win=="save":
             lib("sonido","alerta")
-            Label(self.root,text="Desea Guardar?",font=DEFAULT_FONT_TITLE,border=10).pack()
+            Label(self.root,text="Save?",font=DEFAULT_FONT_TITLE,border=10).pack()
             F = Frame(self.root)
             F.pack()
-            Button(F, text="Si",command=lambda:self.response("si"),width=5,relief=GROOVE).pack(side=LEFT)
+            Button(F, text="Yes",command=lambda:self.response("yes"),width=5,relief=GROOVE).pack(side=LEFT)
             Label(F, text=" ").pack(side=LEFT)
             Button(F, text="No",command=lambda:self.response("no"),width=5,relief=GROOVE).pack()
             
@@ -595,7 +595,7 @@ class pyv:
         
     #Funcion que envia una respuesta
     def response(self,respuesta):
-        if respuesta=="si": self.value = True
+        if respuesta=="yes": self.value = True
         if respuesta=="no": self.value = False
         self.root.destroy()
         
