@@ -19,30 +19,30 @@ FEATURE_POINTS_PATH = '..\database\Feature_points'
 
 
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
-def create_file_database(image_path):
+def create_file_database(image_path, kpt, des):
   
     feature_points = []
     descriptors = []
-    
-    img, kpt, des = calculate_feature_points(image_path)
         
-    feature_points.append(kpt)
-    descriptors.append(des)
+    #feature_points.append(kpt)
+    #descriptors.append(des)
     
     #get image name, without complete path
     img_filename, _ = os.path.splitext(image_path)
     file_basename = basename(img_filename)
     file = FILE_PATH + file_basename
-
+    print('file: %s' % file,flush=True)
+    print('kpt: %s' % len(kpt),flush=True)
+    print('des: %s' % len(des),flush=True)
+    
     temp_kp = []
     i = 0
-    for kpts_list in feature_points:
+    
+     for kpts_list in kpt:
         pickle_tmp = pickle_keypoints(kpts_list, des[i])
         i = i + 1
         temp_kp.append(pickle_tmp)
-        
-    print('temp_kp: %s' % len(temp_kp),flush=True)
-
+    
     with open(file, 'wb') as fp:
         pickle.dump(temp_kp, fp)
         
