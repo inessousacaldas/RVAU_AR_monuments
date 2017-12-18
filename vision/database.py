@@ -39,12 +39,6 @@ def create_file_database(image_path):
     for kpts_list in feature_points:
         pickle_tmp = pickle_keypoints(kpts_list, des[i])
         i = i + 1
-        print('kpts_list: %s' % len(kpts_list),flush=True)
-        print('des: %s' % len(des),flush=True)
-        print('pickle_tmp: %s' % len(pickle_tmp),flush=True)
-        print(pickle_tmp[0], flush=True)
-        print(pickle_tmp[1], flush=True)
-        print('des[i]: %s' % len(des[i]),flush=True)
         temp_kp.append(pickle_tmp)
         
     print('temp_kp: %s' % len(temp_kp),flush=True)
@@ -63,26 +57,24 @@ def load_fileImages_database():
         file_list.append(filename)
        
     
-    print(file_list, flush=True)
     #Create database if not exist
     if len(file_list) < 1:
         print("no database for feature_points and descriptors", flush=True)
     
     else:
-        with open ('..\\database\\vision\\img1_01', 'rb') as fp:
-            temp_kp = pickle.load(fp)  
+        for file in file_list:
+            with open (file, 'rb') as fp:
+                temp_kp = pickle.load(fp)  
 
-        feature_points = []
-        descriptors = []
-       
-        for list_kp in temp_kp:
-            temp_feature, temp_desc = unpickle_keypoints(list_kp)
-            feature_points.append(temp_feature)
-            descriptors.append(temp_desc)
+            feature_points = []
+            descriptors = []
+           
+            for list_kp in temp_kp:
+                temp_feature, temp_desc = unpickle_keypoints(list_kp)
+                feature_points.append(temp_feature)
+                descriptors.append(temp_desc)
 
-       
         return feature_points, descriptors
-    
 
 
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
