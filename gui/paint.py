@@ -1,9 +1,9 @@
 from lib import *
 from pyv import *
 from PIL import ImageTk, Image
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import pickle
+
+from vision.choose import select_region
 
 #Funciones intrinsecas de Paint
 def isNumerable(x):
@@ -104,7 +104,7 @@ class Paint:
                                       DEFAULT_TOOL_STYLE[3],DEFAULT_TOOL_STYLE[4]]
             self.draw = False
             self.mainArchive = ""
-
+            self.imageBackgroundPath = ""
             #Window Creation
             self.main = Tk()
             self.main.focus_force()
@@ -255,6 +255,10 @@ class Paint:
             self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=10,justify=CENTER,wraplength=125)
             self.messageUser.pack()
 
+            #Vision
+            Label(Buttonframe,text="Vision",border=10).pack()
+            Button(Buttonframe,text="Key Points",relief=GROOVE,width=20,command=self.computeKeyPoints).pack()
+
             #Init functions indev
             self.tools(self.activeTool)
             self.screen.bind("<ButtonRelease-1>",self.posPointer)
@@ -345,8 +349,8 @@ class Paint:
                 img.save(DATASAVES+str(txt.value) + '.png', 'png')
                 self.draw = False
                 self.saveLayer(img)
-                
-
+    
+    #Save layer AR
     def saveLayer(self, img):
         img = img.convert("RGBA")
         datas = img.getdata()
@@ -527,8 +531,6 @@ class Paint:
             else:
                 self.messageUser.config(text="")
 
-
-
     #Change tools - eraser, pencil, brushthin, brushthick
     def tools(self,herr):
         if herr=="pencil" or herr==1: self.activeTool=1
@@ -579,6 +581,18 @@ class Paint:
     #Funcion para exit
     def breakpoint(self,breakeable):
         return
+
+    ###########################
+    #Vision
+
+    def computeKeyPoints(self):
+        print("Aqui", flush=True)
+        print("imageBackgroundPath", self.imageBackgroundPath)
+        if(self.imageBackgroundPath==""):
+            #TODO add popup
+            print("Vai apanhar bananas")
+        else:
+            select_region(self.imageBackgroundPath)
 
 #Se carga la clase Paint
 Paint()

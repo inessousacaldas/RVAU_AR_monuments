@@ -49,7 +49,6 @@ def pickle_keypoints(keypoints, desc):
         temp = (point.pt, point.size, point.angle, point.response, point.octave, 
         point.class_id, desc)     
         temp_array.append(temp)
-    
     return temp_array
 
 def unpickle_keypoints(array):

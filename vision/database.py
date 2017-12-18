@@ -4,8 +4,11 @@ from vision.feature_points import calculate_feature_points
 import pickle
 import cv2
 import os.path
-from vision.utils import pickle_keypoints, unpickle_keypoints
+import errno
 from os.path import splitext, basename
+import os
+from vision.utils import pickle_keypoints, unpickle_keypoints
+
 
 
 DATABASE_PATH = '..\database\images\*.jpg'
@@ -15,38 +18,20 @@ FILE_PATH_LOAD = "..\\database\\vision\\*"
 DESCRIPTORS_PATH = '..\database\descriptors'
 FEATURE_POINTS_PATH = '..\database\Feature_points'
 
-#just one image to database
-
 
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
 def create_file_database(image_path, kpt, des):
-  
-    feature_points = []
-    descriptors = []
         
-    #feature_points.append(kpt)
-    #descriptors.append(des)
-    
     #get image name, without complete path
     img_filename, _ = os.path.splitext(image_path)
     file_basename = basename(img_filename)
     file = FILE_PATH + file_basename
-    print('file: %s' % file,flush=True)
-    print('kpt: %s' % len(kpt),flush=True)
-    print('des: %s' % len(des),flush=True)
-    
-    temp_kp = []
-    i = 0
-    
-     for kpts_list in kpt:
-        pickle_tmp = pickle_keypoints(kpts_list, des[i])
-        i = i + 1
-        temp_kp.append(pickle_tmp)
-    
+
+    pickle_tmp = pickle_keypoints(kpt, des)
+
     with open(file, 'wb') as fp:
-        pickle.dump(temp_kp, fp)
+        pickle.dump(pickle_tmp, fp)
         
-#create_file_database('..\database\images\img1_01.jpg')
 
 def load_fileImages_database():
 

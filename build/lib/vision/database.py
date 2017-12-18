@@ -4,13 +4,63 @@ from vision.feature_points import calculate_feature_points
 import pickle
 import cv2
 import os.path
+import errno
+from os.path import splitext, basename
+import os
 from vision.utils import pickle_keypoints, unpickle_keypoints
+
 
 
 DATABASE_PATH = '..\database\images\*.jpg'
 IMAGES_PATH = '..\database\images_cv'
+FILE_PATH = '..\\database\\vision\\'
+FILE_PATH_LOAD = "..\\database\\vision\\*"
 DESCRIPTORS_PATH = '..\database\descriptors'
 FEATURE_POINTS_PATH = '..\database\Feature_points'
+
+
+#image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
+def create_file_database(image_path, kpt, des):
+        
+    #get image name, without complete path
+    img_filename, _ = os.path.splitext(image_path)
+    file_basename = basename(img_filename)
+    file = FILE_PATH + file_basename
+
+    pickle_tmp = pickle_keypoints(kpt, des)
+
+    with open(file, 'wb') as fp:
+        pickle.dump(pickle_tmp, fp)
+        
+
+def load_fileImages_database():
+
+    print("Loading database...", flush=True)
+
+    file_list = []
+    for filename in glob.glob(FILE_PATH_LOAD):
+        file_list.append(filename)
+       
+    
+    #Create database if not exist
+    if len(file_list) < 1:
+        print("no database for feature_points and descriptors", flush=True)
+    
+    else:
+        for file in file_list:
+            with open (file, 'rb') as fp:
+                temp_kp = pickle.load(fp)  
+
+            feature_points = []
+            descriptors = []
+           
+            for list_kp in temp_kp:
+                temp_feature, temp_desc = unpickle_keypoints(list_kp)
+                feature_points.append(temp_feature)
+                descriptors.append(temp_desc)
+
+        return feature_points, descriptors
+
 
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
 def create_database():
