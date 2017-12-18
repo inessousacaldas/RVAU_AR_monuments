@@ -1,38 +1,61 @@
-from random import random
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy.graphics import Color, Ellipse, Line
-from vision.ar_labeling import *
+import tkinter as tk
 
-class MyPaintWidget(Widget):
+class Example(tk.Frame):
+    '''Illustrate how to drag items on a Tkinter canvas'''
 
-    def on_touch_down(self, touch):
-        color = (random(), 1, 1)
-        with self.canvas:
-            Color(*color, mode='hsv')
-            d = 30.
-            Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
-            touch.ud['line'] = Line(points=(touch.x, touch.y))
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
 
-    def on_touch_move(self, touch):
-        touch.ud['line'].points += [touch.x, touch.y]
+        # create a canvas
+        self.canvas = tk.Canvas(width=400, height=400)
+        self.canvas.pack(fill="both", expand=True)
 
+        # this data is used to keep track of an 
+        # item being dragged
+        self._drag_data = {"x": 0, "y": 0, "item": None}
 
-class MyPaintApp(App):
+        # create a couple of movable objects
+        self._create_token((100, 100), "white")
+        self._create_token((200, 100), "black")
 
-    def build(self):
-        parent = Widget()
-        self.painter = MyPaintWidget()
-        clearbtn = Button(text='Clear')
-        clearbtn.bind(on_release=self.clear_canvas)
-        parent.add_widget(self.painter)
-        parent.add_widget(clearbtn)
-        return parent
+        # add bindings for clicking, dragging and releasing over
+        # any object with the "token" tag
+        self.canvas.tag_bind("token", "<ButtonPress-1>", self.on_token_press)
+        self.canvas.tag_bind("token", "<ButtonRelease-1>", self.on_token_release)
+        self.canvas.tag_bind("token", "<B1-Motion>", self.on_token_motion)
 
-    def clear_canvas(self, obj):
-        self.painter.canvas.clear()
+    def _create_token(self, coord, color):
+        '''Create a token at the given coordinate in the given color'''
+        (x,y) = coord
+        self.canvas.create_oval(x-25, y-25, x+25, y+25, 
+                                outline=color, fill=color, tags="token")
 
+    def on_token_press(self, event):
+        '''Begining drag of an object'''
+        # record the item and its location
+        self._drag_data["item"] = self.canvas.find_closest(event.x, event.y)[0]
+        self._drag_data["x"] = event.x
+        self._drag_data["y"] = event.y
 
-if __name__ == '__main__':
-    MyPaintApp().run()
+    def on_token_release(self, event):
+        '''End drag of an object'''
+        # reset the drag information
+        self._drag_data["item"] = None
+        self._drag_data["x"] = 0
+        self._drag_data["y"] = 0
+
+    def on_token_motion(self, event):
+        '''Handle dragging of an object'''
+        # compute how much the mouse has moved
+        delta_x = event.x - self._drag_data["x"]
+        delta_y = event.y - self._drag_data["y"]
+        # move the object the appropriate amount
+        self.canvas.move(self._drag_data["item"], delta_x, delta_y)
+        # record the new position
+        self._drag_data["x"] = event.x
+        self._drag_data["y"] = event.y
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    Example(root).pack(fill="both", expand=True)
+    root.mainloop()
