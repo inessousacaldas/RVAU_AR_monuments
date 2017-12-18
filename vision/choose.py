@@ -1,59 +1,33 @@
 import cv2
 import numpy as np
-
-
-
-def mouseHandler(event,x,y,flags,param):
-    global pts_src, im_temp
-    if event == cv2.EVENT_LBUTTONDOWN:
-        cv2.circle(im_temp,(x,y),3,(0,255,255),5,cv2.LINE_AA)
-        cv2.imshow("Image", im_temp)
-        if len(pts_src) < 4:
-            pts_src = np.append(pts_src,[(x,y)],axis=0)
-
-
-def select_Region(image_path):
-    global pts_src, im_temp
-    # Read in the image.
-    im_src = cv2.imread(image_path)
-
-    # Destination image
-    height, width = 400, 300
-    im_dst = np.zeros((height,width,3),dtype=np.uint8)
-
-    """
-    # Create a list of points.
-    pts_dst = np.empty((0,2))
-    pts_dst = np.append(pts_dst, [(0,0)], axis=0)
-    pts_dst = np.append(pts_dst, [(width-1,0)], axis=0)
-    pts_dst = np.append(pts_dst, [(width-1,height-1)], axis=0)
-    pts_dst = np.append(pts_dst, [(0,height-1)], axis=0)
-    """
-    # Create a window
-    cv2.namedWindow("Image", 1)
-
-    im_temp = im_src
-    pts_src = np.empty((0,2))
-
-    cv2.setMouseCallback("Image",mouseHandler)
+from vision.database import create_file_database
+ 
+def select_region(image_path):
+ 
+    # Read image
+    im = cv2.imread(image_path)
+     
+    # Select ROI
+    r = cv2.selectROI(im)
+     
+    # Crop image
+    imCrop = im[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
+ 
+    # Display cropped image
+    cv2.imshow("Image", imCrop)
+   
     
-    cv2.imshow("Image", im_temp)
-    cv2.waitKey(0)
-    #cv2.destroyAllWindows()
-    print("pts_src " , pts_src, flush=True)
+    print('Calculating feature points for image %s' % image_path, flush=True)
     
-    return pts_src
-
-    """   
-   tform, status = cv2.findHomography(pts_src, pts_dst)
-    im_dst = cv2.warpPerspective(im_src, tform,(width,height))
-
-    cv2.imshow("Image", im_dst)
-    cv2.waitKey(0)
-    """
+    gray = cv2.cvtColor(imCrop, cv2.COLOR_BGR2GRAY)
+    # Initiate SIFT detector
+    sift = cv2.xfeatures2d.SIFT_create()
+   
+    # find the keypoints and descriptors with SIFT
+    kp1, des1 = sift.detectAndCompute(gray,None)
+    
+    create_file_database(image_path, kp1,des1)
     
     
+#select_region("..\database\images\\novas\img1_01.jpg")
     
-#test = select_Region("..\database\images\img1_01.jpg")
-#print("test " , test, flush=True)
-
