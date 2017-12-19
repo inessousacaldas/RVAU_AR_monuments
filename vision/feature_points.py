@@ -8,7 +8,8 @@ MIN_MATCH_COUNT = 15
 Computes matches for des1 (test image) to des2 (database)
 """
 def compute_matches(des1, des2):
-
+    print(des1, flush=True)
+    print(des2, flush=True)
     FLANN_INDEX_KDTREE = 0
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
     search_params = dict(checks = 50)
@@ -26,6 +27,7 @@ def calculate_matches(image_des, database_des):
     print("Calculating matches with the database images", flush=True)
     matches = []
     for db_des in database_des:
+        print("A matchar", flush=True)
         mat = compute_matches(db_des, image_des)
         matches.append(mat)
 

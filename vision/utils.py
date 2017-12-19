@@ -43,20 +43,16 @@ def blend_transparent(face_img, overlay_t_img):
     return np.uint8(cv2.addWeighted(face_part, 255.0, overlay_part, 255.0, 0.0))
 
 
-def pickle_keypoints(keypoints, desc):
+def pickle_keypoints(keypoints):
     temp_array = []
     for point in keypoints:
-        temp = (point.pt, point.size, point.angle, point.response, point.octave, 
-        point.class_id, desc)     
+        temp = (point.pt, point.size, point.angle, point.response, point.octave,
+        point.class_id)     
         temp_array.append(temp)
     return temp_array
 
-def unpickle_keypoints(array):
-    keypoints = []
+def unpickle_keypoints(point):
 
-    for point in array:
-       temp_feature = cv2.KeyPoint(x=point[0][0],y=point[0][1],_size=point[1], _angle=point[2], _response=point[3], _octave=point[4], _class_id=point[5])
-       keypoints.append(temp_feature)            
-       temp_descriptor = point[6]
-        
-    return keypoints, temp_descriptor
+    temp_feature = cv2.KeyPoint(x=point[0][0],y=point[0][1],_size=point[1], _angle=point[2], _response=point[3], _octave=point[4], _class_id=point[5])
+  
+    return temp_feature

@@ -4,6 +4,7 @@ from PIL import ImageTk, Image
 import pickle
 
 from vision.choose import select_region
+from vision.ar_labeling import arAppCompute
 
 #Funciones intrinsecas de Paint
 def isNumerable(x):
@@ -258,6 +259,7 @@ class Paint:
             #Vision
             Label(Buttonframe,text="Vision",border=10).pack()
             Button(Buttonframe,text="Key Points",relief=GROOVE,width=20,command=self.computeKeyPoints).pack()
+            Button(Buttonframe,text="Test image",relief=GROOVE,width=20,command=self.arApp).pack()
 
             #Init functions indev
             self.tools(self.activeTool)
@@ -590,9 +592,19 @@ class Paint:
         print("imageBackgroundPath", self.imageBackgroundPath)
         if(self.imageBackgroundPath==""):
             #TODO add popup
-            print("Vai apanhar bananas")
+            print("Select image first.")
         else:
             select_region(self.imageBackgroundPath)
+
+    def arApp(self):
+        print("ArAPP", flush=True)
+        filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+        self.messageUser.config(text="")
+        #if filepath!="" and (filepath[len(filepath)-4:len(filepath)]==".jpg" or filepath[len(filepath)-4:len(filepath)]==".gif"):
+        if filepath!="":
+            print(filepath, flush=True)
+            arAppCompute(filepath)
+
 
 #Se carga la clase Paint
 Paint()

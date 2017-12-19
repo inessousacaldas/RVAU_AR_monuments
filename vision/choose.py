@@ -24,7 +24,7 @@ def select_region(image_path):
     # find the keypoints and descriptors with SIFT
     kp1, des1 = sift.detectAndCompute(gray,None)
 
-    create_file_database(image_path, kp1,des1)
+    create_file_database(image_path, im, kp1,des1)
 
     
     
