@@ -8,7 +8,9 @@ def select_region(image_path):
     im = cv2.imread(image_path)
 
     # Select ROI
-    r = cv2.selectROI(im)
+    cv2.namedWindow('keypoints', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('keypoints', 600,600)
+    r = cv2.selectROI('keypoints', im)
 
     # Crop image
     imCrop = im[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
