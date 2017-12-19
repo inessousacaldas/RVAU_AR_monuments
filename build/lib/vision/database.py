@@ -2,7 +2,6 @@ from PIL import Image
 import glob
 from vision.feature_points import calculate_feature_points
 import pickle
-import cv2
 import os.path
 import errno
 from os.path import splitext, basename
@@ -14,52 +13,90 @@ from vision.utils import pickle_keypoints, unpickle_keypoints
 
 DATABASE_PATH = '..\database\images\*.jpg'
 IMAGES_PATH = '..\database\images_cv'
-FILE_PATH_KEYPOINTS = '..\\database\\vision\\keypoints\\'
-FILE_PATH_DESCRIPTORS = '..\\database\\vision\\descriptors\\'
-FILE_PATH_IMAGE = '..\\database\\vision\\images\\'
-FILE_PATH_LOAD_KEYPOINTS = "..\\database\\vision\\keypoints\\*"
-FILE_PATH_LOAD_DESCRIPTORS = "..\\database\\vision\\descriptors\\*"
-FILE_PATH_IMAGE_LOAD = "..\\database\\vision\\images\\*"
+
+#SIFT
+FILE_PATH_KEYPOINTS_SIFT = '..\\database\\vision\\sift\\keypoints\\'
+FILE_PATH_DESCRIPTORS_SIFT = '..\\database\\vision\\sift\\descriptors\\'
+FILE_PATH_IMAGE_SIFT = '..\\database\\vision\\sift\\images\\'
+FILE_PATH_LOAD_KEYPOINTS_SIFT = "..\\database\\vision\\sift\\keypoints\\*"
+FILE_PATH_LOAD_DESCRIPTORS_SIFT = "..\\database\\vision\\sift\\descriptors\\*"
+FILE_PATH_IMAGE_LOAD_SIFT = "..\\database\\vision\\sift\\images\\*"
+
+#SURF
+FILE_PATH_KEYPOINTS_SURF = '..\\database\\vision\\surf\\keypoints\\'
+FILE_PATH_DESCRIPTORS_SURF = '..\\database\\vision\\surf\\descriptors\\'
+FILE_PATH_IMAGE_SURF = '..\\database\\vision\\surf\\images\\'
+FILE_PATH_LOAD_KEYPOINTS_SURF = "..\\database\\vision\\surf\\keypoints\\*"
+FILE_PATH_LOAD_DESCRIPTORS_SURF = "..\\database\\vision\\surf\\descriptors\\*"
+FILE_PATH_IMAGE_LOAD_SURF = "..\\database\\vision\\surf\\images\\*"
 
 
 
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
-def create_file_database(image_path, img, kpt, des):
-        
-    #get image name, without complete path
+def create_file_database(type_alg, image_path, img, kpt, des):
+
+     #get image name, without complete path
     img_filename, _ = os.path.splitext(image_path)
     file_basename = basename(img_filename)
-    file_kp = FILE_PATH_KEYPOINTS + file_basename
-    
+
+    if(type_alg == 'sift'):
+        file_kp = FILE_PATH_KEYPOINTS_SIFT + file_basename
+        file_desc = FILE_PATH_DESCRIPTORS_SIFT + file_basename
+        file_img = FILE_PATH_IMAGE_SIFT + file_basename
+
+    elif(type_alg == 'surf'):
+        file_kp = FILE_PATH_KEYPOINTS_SURF + file_basename
+        file_desc = FILE_PATH_DESCRIPTORS_SURF + file_basename
+        file_img = FILE_PATH_IMAGE_SURF + file_basename
+    else:
+        print("Unknown algorithm when creating database.", flush=True)
+        return
+
     pickle_tmp = pickle_keypoints(kpt)
 
     with open(file_kp, 'wb') as fp:
         pickle.dump(pickle_tmp, fp)
     
-    file_desc = FILE_PATH_DESCRIPTORS + file_basename
+    
     with open(file_desc, 'wb') as fp:
         pickle.dump(des, fp)
 
-    file_img = FILE_PATH_IMAGE + file_basename
+    
     with open(file_img, 'wb') as fp:
         pickle.dump(img, fp)
 
 
-
-def load_fileImages_database():
+def load_fileImages_database(type_alg):
 
     print("Loading database...", flush=True)
 
+    file_kp = ""
+    file_desc = ""
+    file_img = ""
+
+    if(type_alg == 'sift'):
+        file_kp = FILE_PATH_LOAD_KEYPOINTS_SIFT
+        file_desc = FILE_PATH_LOAD_DESCRIPTORS_SIFT
+        file_img = FILE_PATH_IMAGE_LOAD_SIFT
+
+    elif(type_alg == 'surf'):
+        file_kp = FILE_PATH_LOAD_KEYPOINTS_SURF
+        file_desc = FILE_PATH_LOAD_DESCRIPTORS_SURF
+        file_img = FILE_PATH_IMAGE_LOAD_SURF
+    else:
+        print("Unknown algorithm", flush=True)
+        return
+
     file_list_keypoints = []
-    for filename in glob.glob(FILE_PATH_LOAD_KEYPOINTS):
+    for filename in glob.glob(file_kp):
         file_list_keypoints.append(filename)
     
     file_list_descriptors = []
-    for filename in glob.glob(FILE_PATH_LOAD_DESCRIPTORS):
+    for filename in glob.glob(file_desc):
         file_list_descriptors.append(filename)
 
     file_list_image = []
-    for filename in glob.glob(FILE_PATH_IMAGE_LOAD):
+    for filename in glob.glob(file_img):
         file_list_image.append(filename)
     
     
@@ -105,7 +142,7 @@ def load_fileImages_database():
         print("LOAD COMPLETO", flush=True)
         return all_images_cv, all_feature_points, all_descriptors
 
-
+"""
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
 def create_database():
     
@@ -163,5 +200,5 @@ def load_database():
         feature_points.append(temp_feature)
     
     return images_cv, feature_points, descriptors
-    
+"""    
     

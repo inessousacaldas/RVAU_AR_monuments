@@ -86,6 +86,8 @@ DEFAULT_TOOL = C_DATA[6]
 BACKGROUND_WINDOW = '#37474F'
 BUTTONS_COLOR = '#455A64'
 
+LINE, OVAL, RECTANGLE, ARC = list(range(4))
+PENCIL, THIN, THICK = list(range(3))
 
 #Class paint
 class Paint:
@@ -96,7 +98,9 @@ class Paint:
         try:
             #Draw variables
             self.pos = [[0,0],[0,0]]
-            self.activeFigure = 0
+            self.activeFigure = None
+            self._obj, self._objSave = None, None
+            self.lastx, self.lasty = None, None
             self.vertices = 0
             self.pointable = []
             self.befpoint = [0,0]
@@ -104,14 +108,16 @@ class Paint:
             self.activeTool = DEFAULT_TOOL
             self.activeColor = DEFAULT_COLOR
             self.backgroundColor = DEFAULT_COLOR
-            self.eraserColor = DEFAULT_ERASER
             self.toolWeight = DEFAULT_TOOL_WEIGHT
             self.toolStyle = [DEFAULT_TOOL_STYLE[0],DEFAULT_TOOL_STYLE[1],DEFAULT_TOOL_STYLE[2],\
                                       DEFAULT_TOOL_STYLE[3],DEFAULT_TOOL_STYLE[4]]
             self.draw = False
             self.mainArchive = ""
             self.imageBackgroundPath = ""
-            
+            #Elements draw on canvas
+            self.stackElements = []
+            self.stackElementsSave = []
+
             #Window Creation
             self.main = Tk()
             style = ttk.Style()
@@ -159,7 +165,6 @@ class Paint:
             colorMenu = Menu(settingsMenu,tearoff=0)
             settingsMenu.add_cascade(label="Change Color",menu=colorMenu)
             colorMenu.add_command(label="Background",command=lambda:self.colorChange("background"))
-            colorMenu.add_command(label="Eraser",command=lambda:self.colorChange("eraser"))
             colorMenu.add_command(label="Main",command=lambda:self.colorChange("active"))
             settingsMenu.add_command(label="Tool Style",command=self.styleToolChange)
             settingsMenu.add_command(label="Tool Weight",command=self.toolWeightChange)
@@ -167,7 +172,7 @@ class Paint:
 
             #Insert
             insertMenu = Menu(menuBar,tearoff=0)
-            insertMenu.add_command(label="Arch",command= lambda: self.createFigure("arch"))
+            insertMenu.add_command(label="Arc",command= lambda: self.createFigure("arc"))
             insertMenu.add_command(label="Square",command= lambda: self.createFigure("square"))
             insertMenu.add_command(label="Image",command= lambda: self.createFigure("image"))
             insertMenu.add_command(label="Oval",command= lambda: self.createFigure("oval"))
@@ -179,7 +184,6 @@ class Paint:
             #Tools
             toolsMenu = Menu(menuBar,tearoff=0)
             tMenu = Menu(toolsMenu,tearoff=0)
-            tMenu.add_command(label="Eraser",command=lambda:self.tools("eraser"))
             tMenu.add_command(label="Pencil",command=lambda:self.tools("pencil"))
             tMenu.add_command(label="Thin Brush",command=lambda:self.tools("brushthin"))
             tMenu.add_command(label="Thick Brush",command=lambda:self.tools("brushthick"))
@@ -217,16 +221,66 @@ class Paint:
             self.screen.grid()
             self.screenSave.grid()
 
-            
             #Buttons
             Buttonframe = Frame(ParentFrame,border=5, background=BACKGROUND_WINDOW)
             Buttonframe.grid(row=0, column=1, sticky="NW")
-            Label(Buttonframe,text="tools",border=10).pack()
-            ttk.Button(Buttonframe,text="Eraser",width=20,command=lambda:self.tools("eraser"), style="TButton").pack()
-            ttk.Button(Buttonframe,text="Pencil",width=20,command=lambda:self.tools("pencil")).pack()
-            ttk.Button(Buttonframe,text="Thin Brush",width=20,command=lambda:self.tools("brushthin")).pack()
-            ttk.Button(Buttonframe,text="Thick Brush",width=20,command=lambda:self.tools("brushthick")).pack()
-            ttk.Button(Buttonframe,text="Insert Object",width=20,command=self.insertFigureMenu).pack()
+            Label(Buttonframe,text="Tools",border=10).pack()
+            
+            b_undo = ttk.Button(Buttonframe,text="Undo",width=20,command=self.undoElement, style="TButton")
+            image_undo = Image.open(DATAICONS + "eraser.png")
+            image_undo = image_undo.resize((32,32), Image.ANTIALIAS)
+            image_undo = ImageTk.PhotoImage(image_undo)
+            b_undo.config(image=image_undo)
+            b_undo.pack()
+
+            b_pencil = ttk.Button(Buttonframe,text="Pencil",width=20,command=lambda:self.tools("pencil"), style="TButton")
+            image_pencil = Image.open(DATAICONS + "pencil.png")
+            image_pencil = image_pencil.resize((32,32), Image.ANTIALIAS)
+            image_pencil = ImageTk.PhotoImage(image_pencil)
+            b_pencil.config(image=image_pencil)
+            b_pencil.pack()
+
+            
+            ttk.Button(Buttonframe,text="Thin Brush",width=20,command=lambda:self.tools("brushthin"), style="TButton").pack()
+            
+            
+            ttk.Button(Buttonframe,text="Thick Brush",width=20,command=lambda:self.tools("brushthick"), style="TButton").pack()
+            
+            ttk.Button(Buttonframe,text="Insert Object",width=20,command=self.insertFigureMenu, style="TButton").pack()
+
+            #Insert Figures
+            FiguresInsert = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            FiguresInsert.pack()
+
+            b_line = ttk.Button(FiguresInsert,text="Insert Line",width=20,command=lambda:self.createFigure('line'), style="TButton")
+            image_line = Image.open(DATAICONS + "line.png")
+            image_line = image_line.resize((32,32), Image.ANTIALIAS)
+            image_line = ImageTk.PhotoImage(image_line)
+            b_line.config(image=image_line)
+            b_line.pack(side=LEFT)
+
+            b_square = ttk.Button(FiguresInsert,text="Insert Square",width=20,command=lambda:self.createFigure('square'), style="TButton")
+            image_square = Image.open(DATAICONS + "square.png")
+            image_square = image_square.resize((32,32), Image.ANTIALIAS)
+            image_square = ImageTk.PhotoImage(image_square)
+            b_square.config(image=image_square)
+            b_square.pack(side=LEFT)
+            
+            b_oval = ttk.Button(FiguresInsert,text="Insert Oval",width=20,command=lambda:self.createFigure('oval'), style="TButton")
+            image_oval = Image.open(DATAICONS + "circle.png")
+            image_oval = image_oval.resize((32,32), Image.ANTIALIAS)
+            image_oval = ImageTk.PhotoImage(image_oval)
+            b_oval.config(image=image_oval)
+            b_oval.pack(side=LEFT)
+
+            b_arc = ttk.Button(FiguresInsert,text="Insert Arc",width=20,command=lambda:self.createFigure('arc'), style="TButton")
+            image_arc = Image.open(DATAICONS + "arc.png")
+            image_arc = image_arc.resize((32,32), Image.ANTIALIAS)
+            image_arc = ImageTk.PhotoImage(image_arc)
+            b_arc.config(image=image_arc)
+            b_arc.pack(side=LEFT)
+            
+            
 
             #Tools info
             Label(Buttonframe,text="tools",border=10).pack()
@@ -236,6 +290,7 @@ class Paint:
             self.infoWeightPencil.pack(side=LEFT)
             Label(WeightPencil,text="  ").pack(side=LEFT)
             ttk.Button(WeightPencil,text="Weight",command=self.toolWeightChange,width=9).pack()
+            
             PencilStyle = Frame(Buttonframe, background=BACKGROUND_WINDOW)
             PencilStyle.pack()
             Label(PencilStyle,text=" ",border=3,font=10,width=2).pack(side=LEFT)
@@ -248,27 +303,39 @@ class Paint:
             activeColor.pack()
             self.infoactivedcolor = Canvas(activeColor,width=30,height=20,bg=self.activeColor)
             self.infoactivedcolor.pack(side=LEFT)
-            ttk.Button(activeColor,text="Tool",command=lambda:self.colorChange("active"),width=10).pack()
-            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
-            activeColor.pack()
-            self.infoactivedbackgroundcolor = Canvas(activeColor,width=30,height=20,bg=self.backgroundColor)
-            self.infoactivedbackgroundcolor.pack(side=LEFT)
-            ttk.Button(activeColor,text="Color2",command=lambda:self.colorChange("background"),width=10).pack()
-            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
-            activeColor.pack()
-            self.infoactivedcoloreraser = Canvas(activeColor,width=30,height=20,bg=self.eraserColor)
-            self.infoactivedcoloreraser.pack(side=LEFT)
-            ttk.Button(activeColor,text="Eraser",command=lambda:self.colorChange("eraser"),width=10).pack()
+            
+            b_color = ttk.Button(activeColor,text="Color 1",command=lambda:self.colorChange("active"),width=10)
+            image_color = Image.open(DATAICONS + "paint.png")
+            image_color = image_color.resize((32,32), Image.ANTIALIAS)
+            image_color = ImageTk.PhotoImage(image_color)
+            b_color.config(image=image_color)
+            b_color.pack()
 
+            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            activeColor.pack()
+            self.infoactivedbackgroundcolor = Canvas(activeColor,width=30,height=32,bg=self.backgroundColor)
+            self.infoactivedbackgroundcolor.pack(side=LEFT)
+            
+            b_colorBucket = ttk.Button(activeColor,text="Color 2",command=lambda:self.colorChange("background"),width=10)
+            image_color_bucket = Image.open(DATAICONS + "paint2.png")
+            image_color_bucket = image_color_bucket.resize((32,32), Image.ANTIALIAS)
+            image_color_bucket = ImageTk.PhotoImage(image_color_bucket)
+            b_colorBucket.config(image=image_color_bucket)
+            b_colorBucket.pack()
+            
+            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            activeColor.pack()
+            
             #Info for user
             Label(Buttonframe,height=1).pack()
-            self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=10,justify=CENTER,wraplength=125)
+            self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=5,justify=CENTER,wraplength=125)
             self.messageUser.pack()
 
             #Vision
             Label(Buttonframe,text="Vision",border=10).pack()
             ttk.Button(Buttonframe,text="Key Points",width=20,command=self.computeKeyPoints).pack()
-            ttk.Button(Buttonframe,text="Test image",width=20,command=self.arApp).pack()
+            ttk.Button(Buttonframe,text="SIFT",width=20,command=lambda:self.arApp('sift')).pack()
+            ttk.Button(Buttonframe,text="SURF",width=20,command=lambda:self.arApp('surf')).pack()
 
             #Init functions indev
             self.tools(self.activeTool)
@@ -282,45 +349,73 @@ class Paint:
             #lib("error","kernel",[2])
             #lib("error","kernel",[3])
 
+    #Undo Elements
+    def undoElement(self):
+        if(len(self.stackElements) > 0):
+            element = self.stackElements.pop()
+            self.screen.delete(element)
+            self.draw = True
+        if(len(self.stackElementsSave) > 0):
+            element = self.stackElementsSave.pop()
+            self.screenSave.delete(element)
+            self.draw = True
+
     #Free draw
     def freeDraw(self,event):
-        if self.activeTool==1 or self.activeTool==3 or self.activeTool==4:
+        
+        if self.activeTool==PENCIL or self.activeTool==THIN or self.activeTool==THICK:
             colorpaint = self.activeColor
-        if self.activeTool==2:
-            colorpaint = self.eraserColor
+        
         if self.toolWeight==1:
             if self.befpoint==[0,0]:
                 self.befpoint = [event.x,event.y]
-            self.screen.create_line(event.x,event.y,self.befpoint[0]+self.toolStyle[0]-DEFAULT_TOOL_STYLE[0],self.befpoint[1]+\
+            
+            element = self.screen.create_line(event.x,event.y,self.befpoint[0]+self.toolStyle[0]-DEFAULT_TOOL_STYLE[0],self.befpoint[1]+\
                                   self.toolStyle[1]-DEFAULT_TOOL_STYLE[1], dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,smooth=self.toolStyle[3])
-            self.screenSave.create_line(event.x,event.y,self.befpoint[0]+self.toolStyle[0]-DEFAULT_TOOL_STYLE[0],self.befpoint[1]+\
+            elementS = self.screenSave.create_line(event.x,event.y,self.befpoint[0]+self.toolStyle[0]-DEFAULT_TOOL_STYLE[0],self.befpoint[1]+\
                                   self.toolStyle[1]-DEFAULT_TOOL_STYLE[1], dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,smooth=self.toolStyle[3])
+            
+            self.stackElements.append(element)
+            self.stackElementsSave.append(elementS)
+
             self.befpoint = [event.x,event.y]
+        
         else:
-            if self.activeTool==3:
-                self.screenSave.create_rectangle(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+            if self.activeTool==THIN:
+                elementS = self.screenSave.create_rectangle(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,outline = colorpaint)
-                self.screen.create_rectangle(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+                element = self.screen.create_rectangle(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,outline = colorpaint)
-                                 
-            elif self.activeTool==4:
-                self.screen.create_oval(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+                
+                self.stackElements.append(element)
+                self.stackElementsSave.append(elementS)           
+            
+            elif self.activeTool==THICK:
+                element = self.screen.create_oval(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,outline = colorpaint)
-                self.screenSave.create_oval(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+                elementS = self.screenSave.create_oval(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,outline = colorpaint)
+                
+                self.stackElements.append(element)
+                self.stackElementsSave.append(elementS)
+            
             else:
-                self.screen.create_line(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+                element = self.screen.create_line(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,smooth=self.toolStyle[3])
-                self.screenSave.create_line(event.x,event.y,event.x+self.toolStyle[0],event.y+\
+                elementS = self.screenSave.create_line(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,smooth=self.toolStyle[3])
+                
+                self.stackElements.append(element)
+                self.stackElementsSave.append(elementS)
+        
         self.draw = True
 
     #New image
@@ -335,7 +430,7 @@ class Paint:
         self.draw = False
 
     #Save imagen
-    def saveImage(self,i="null"):
+    def saveImage(self,i="null"):#TODO
         if self.draw:
             self.screen.update()
             self.screenSave.update()
@@ -385,17 +480,18 @@ class Paint:
 
     #Save Color Tools    - active, eraser
     def colorChange(self,tools):
-        a = pyv("Change color",DATAICONS+"color.ico","changeColor",(280,440))
-        a.root.mainloop(1)
-        if a.value!=0:
+        color = askcolor()
+        print("aa", color[1], flush = True)
+        color = color[1]
+        if color!=0:
             if tools=="active":
-                self.activeColor = a.value
+                self.activeColor = color
                 self.infoactivedcolor.config(bg=self.activeColor)
             if tools=="eraser":
-                self.eraserColor = a.value
+                self.eraserColor = color
                 self.infoactivedcoloreraser.config(bg=self.eraserColor)
             if tools=="background":
-                self.backgroundColor = a.value
+                self.backgroundColor = color
                 self.infoactivedbackgroundcolor.config(bg=self.backgroundColor)
 
     #Change weight of tools
@@ -488,29 +584,28 @@ class Paint:
     #Create figures
     def createFigure(self,figura):
         if figura=="square":
-            self.screen.bind("<ButtonPress-1>",self.callbackPos)
-            self.screen.bind("<B1-Motion>",self.breakpoint)
-            self.activeFigure = 1
-            self.messageUser.config(text="Haga click en dos puntos del dibujo para crear un cuadrado")
+            self.screen.bind("<ButtonPress-1>", self.update_xy)
+            self.screen.bind("<B1-Motion>", self.drawFigure)
+            self.activeFigure = RECTANGLE
+            self.messageUser.config(text="Drag to create rectangle")
         if figura=="oval":
-            self.screen.bind("<ButtonPress-1>",self.callbackPos)
-            self.screen.bind("<B1-Motion>",self.breakpoint)
-            self.activeFigure = 2
-            self.messageUser.config(text="Haga click en dos puntos del dibujo para crear un ovalo")
+            self.screen.bind("<ButtonPress-1>",self.update_xy)
+            self.screen.bind("<B1-Motion>",self.drawFigure)
+            self.activeFigure = OVAL
+            self.messageUser.config(text="Drag to create oval")
         if figura=="line":
-            self.screen.bind("<ButtonPress-1>",self.callbackPos)
-            self.screen.bind("<B1-Motion>",self.breakpoint)
-            self.messageUser.config(text="Haga click en dos puntos del dibujo para crear una recta")
-            self.activeFigure = 3
+            self.screen.bind("<ButtonPress-1>", self.update_xy)
+            self.screen.bind("<B1-Motion>", self.drawFigure)
+            self.messageUser.config(text="Drag to create line")
+            self.activeFigure = LINE
         if figura=="text":
             self.screen.bind("<ButtonPress-1>",self.crearTexto)
             self.messageUser.config(text="Haga click en el dibujo para poner su texto")
-        if figura=="arch":
-            self.screen.bind("<ButtonPress-1>",self.callbackPos)
-            self.screen.bind("<B1-Motion>",self.breakpoint)
-            self.activeFigure = 5
-            self.messageUser.config(text="Haga click en dos puntos del dibujo para definir los limites de su arco")
-        
+        if figura=="arc":
+            self.screen.bind("<ButtonPress-1>",self.update_xy)
+            self.screen.bind("<B1-Motion>",self.drawFigure)
+            self.activeFigure = ARC
+            self.messageUser.config(text="Drag to create arc")   
         if figura=="image":
             self.messageUser.config(text="Ingrese la ubicacion de su imagen")
             filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
@@ -544,18 +639,17 @@ class Paint:
 
     #Change tools - eraser, pencil, brushthin, brushthick
     def tools(self,herr):
-        if herr=="pencil" or herr==1: self.activeTool=1
-        if herr=="eraser" or herr==2: self.activeTool=2
-        if herr=="brushthin" or herr==3: self.activeTool=3
-        if herr=="brushthick" or herr==4: self.activeTool=4
+        if herr=="pencil" or herr==1: self.activeTool=PENCIL
+        if herr=="brushthin" or herr==3: self.activeTool=THIN
+        if herr=="brushthick" or herr==4: self.activeTool=THICK
         self.screen.bind("<B1-Motion>",self.freeDraw)
 
-    #Cargar una ventana con helps
+    #Load window with help
     def help(self,i="null"):
         a = pyv("help",DATAICONS+"help.ico","help",(600,400),[PROGRAM_TITLE,DATADOCS+"help.TXT"])
         a.root.mainloop(0)
 
-    #Insertar una imagen
+    #Insert image
     def insertImage(self,event):
         imagen = PhotoImage(file=self.mainArchive)
         self.screen.create_image(event.x,event.y,image=imagen)
@@ -593,6 +687,44 @@ class Paint:
     def breakpoint(self,breakeable):
         return
 
+
+    #TODO
+    def drawFigure(self, event):
+        if self.activeFigure is None or self._obj is None:
+            return
+        x, y = self.lastx, self.lasty
+        if self.activeFigure in (LINE, RECTANGLE, OVAL, ARC):
+            self.screen.coords(self._obj, (x, y, event.x, event.y))
+            self.screenSave.coords(self._objSave, (x, y, event.x, event.y))
+
+    def update_xy(self, event):
+        if self.activeFigure is None:
+            return
+        x, y = event.x, event.y
+        
+        if self.activeFigure == LINE:
+            self._obj = self.screen.create_line((x, y, x, y), fill=self.activeColor,width=self.toolWeight)
+            self._objSave = self.screenSave.create_line((x, y, x, y), fill=self.activeColor,width=self.toolWeight)
+        
+        elif self.activeFigure == RECTANGLE:
+            self._obj = self.screen.create_rectangle((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+            self._objSave = self.screenSave.create_rectangle((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+        
+        elif self.activeFigure == OVAL:
+            self._obj = self.screen.create_oval((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+            self._objSave = self.screenSave.create_oval((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+        
+        elif self.activeFigure == ARC:
+            self._obj = self.screen.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+            self._objSave = self.screenSave.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+        
+        element = self._obj
+        elementS = self._objSave
+        self.stackElements.append(element)
+        self.stackElementsSave.append(elementS)
+        self.draw = True
+        self.lastx, self.lasty = x, y
+
     ###########################
     #Vision
 
@@ -605,14 +737,14 @@ class Paint:
         else:
             select_region(self.imageBackgroundPath)
 
-    def arApp(self):
+    def arApp(self, algorithm):
         print("ArAPP", flush=True)
         filepath = askopenfilename(title="Open",initialdir=TEST_PATH,defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
         self.messageUser.config(text="")
         #if filepath!="" and (filepath[len(filepath)-4:len(filepath)]==".jpg" or filepath[len(filepath)-4:len(filepath)]==".gif"):
         if filepath!="":
             print(filepath, flush=True)
-            arAppCompute(filepath)
+            arAppCompute(filepath, algorithm, 0.6)
 
 
 #Se carga la clase Paint

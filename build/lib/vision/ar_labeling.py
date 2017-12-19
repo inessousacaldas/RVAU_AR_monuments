@@ -1,16 +1,18 @@
 from __future__ import print_function
 from PIL import Image
-from vision.database import load_database, load_fileImages_database
+from vision.database import load_fileImages_database
 from vision.feature_points import *
 from vision.utils import get_image_layerAR
 from vision.feature_points import *
 
 IMAGE_TEST_PATH = '..\database\sample\image.jpg'
 
-def image_test(image_test, database_images):
+# Tests the user image with databe and computes the homography, then it shows the results
+# Need algorithm type and ransac value
+def image_test(image_test, database_images, algorithm_type, ransac_value):
     
     #Calculates feature points for test image
-    img, kp, des = calculate_feature_points(image_test)
+    img, kp, des = calculate_feature_points(image_test, algorithm_type)
 
     image = [img, kp, des]
     
@@ -30,30 +32,33 @@ def image_test(image_test, database_images):
             max_matches = len(matches[i])
             index_max = i
 
-    print('Found %d matches for database image %d' % (max_matches, index_max), flush=True)
+    print('Found %d matches for database image %d' % (max_matches, index_max + 1), flush=True)
 
     layerAR = get_image_layerAR(index_max)
 
     database_image = [database_images[0][index_max], database_images[1][index_max], database_images[2][index_max]]
    
-    compute_homography(image_test, image, database_image, layerAR, matches[index_max])
+    compute_homography(image_test, image, database_image, layerAR, matches[index_max], ransac_value)
 
+# compute the test image and show the findings 
+# args : the image path, the algorithm name ('sift' or 'surf') and the ransac value (float)
+# arAppCompute('..\database\images\c\img1_01.jpg', 'surf', 0.6) 
+def arAppCompute(image_test_path, algorithm_type, ransac_value):
 
-def arAppCompute(image_test_path):
-
-    images_cv, feature_points, descriptors = load_fileImages_database()
-    print(len(images_cv), len(feature_points), len(descriptors))
+    images_cv, feature_points, descriptors = load_fileImages_database(algorithm_type)
     database_images = [images_cv, feature_points, descriptors]
     
-    image_test(image_test_path, database_images)
+    image_test(image_test_path, database_images, algorithm_type, ransac_value)
 
+"""
 def main():
 
     images_cv, feature_points, descriptors = load_database()
     database_images = [images_cv, feature_points, descriptors]
  
-    image_test(IMAGE_TEST_PATH, database_images)
+    image_test(IMAGE_TEST_PATH, database_images, 'sift', 0.6)
 
 
 if __name__== "__main__":
     main()
+"""

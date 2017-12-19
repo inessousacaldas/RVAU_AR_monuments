@@ -2,6 +2,7 @@
 #Autor: Ines Caldas and Joel Carneiro
 
 from lib import *
+from tkinter.colorchooser import *
 
 #Important Variables
 DEFAULT_FONT_TITLE="Arial",10
@@ -25,212 +26,7 @@ class pyv:
         self.root.title(title)
         self.root.minsize(width=size[0], height=size[1])
         self.root.resizable(width=False, height=False)
-        
-        #Change Color
-        if type_win=="changeColor":
-            Label(self.root,text="Choose Color",font=DEFAULT_FONT_TITLE,border=10).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#ff0000").pack(side=LEFT)
-            Button(F1_A,text="Rojo",relief=GROOVE,command=lambda:self.putcolor("#FF0000"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#0000FF").pack(side=LEFT)
-            Button(F1_B,text="Azul",relief=GROOVE,command=lambda:self.putcolor("#0000FF"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#FFFF00").pack(side=LEFT)
-            Button(F1_A,text="Amarillo",relief=GROOVE,command=lambda:self.putcolor("#FFFF00"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#800080").pack(side=LEFT)
-            Button(F1_B,text="Morado",relief=GROOVE,command=lambda:self.putcolor("#800080"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#FFC0CB").pack(side=LEFT)
-            Button(F1_A,text="Rosado",relief=GROOVE,command=lambda:self.putcolor("#FFC0CB"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#FFA500").pack(side=LEFT)
-            Button(F1_B,text="Naranjo",relief=GROOVE,command=lambda:self.putcolor("#FFA500"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#000080").pack(side=LEFT)
-            Button(F1_A,text="Azul marino",relief=GROOVE,command=lambda:self.putcolor("#000080"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#ADFF2F").pack(side=LEFT)
-            Button(F1_B,text="Verde",relief=GROOVE,command=lambda:self.putcolor("#ADFF2F"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#DDA0DD").pack(side=LEFT)
-            Button(F1_A,text="Ciruela",relief=GROOVE,command=lambda:self.putcolor("#DDA0DD"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#FA8072").pack(side=LEFT)
-            Button(F1_B,text="Salmon",relief=GROOVE,command=lambda:self.putcolor("#FA8072"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#008000").pack(side=LEFT)
-            Button(F1_A,text="Verde Oscuro",relief=GROOVE,command=lambda:self.putcolor("#008000"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#00FF00").pack(side=LEFT)
-            Button(F1_B,text="Verde Lima",relief=GROOVE,command=lambda:self.putcolor("#00FF00"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#008080").pack(side=LEFT)
-            Button(F1_A,text="Celeste Oscuro",relief=GROOVE,command=lambda:self.putcolor("#008080"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#00FFFF").pack(side=LEFT)
-            Button(F1_B,text="Cyan",relief=GROOVE,command=lambda:self.putcolor("#00FFFF"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#808000").pack(side=LEFT)
-            Button(F1_A,text="Oliva",relief=GROOVE,command=lambda:self.putcolor("#808000"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#800000").pack(side=LEFT)
-            Button(F1_B,text="Marron",relief=GROOVE,command=lambda:self.putcolor("#800000"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#643200").pack(side=LEFT)
-            Button(F1_A,text="Marron Claro",relief=GROOVE,command=lambda:self.putcolor("#643200"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#C86400").pack(side=LEFT)
-            Button(F1_B,text="Marron Oscuro",relief=GROOVE,command=lambda:self.putcolor("#C86400"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#5E5E5E").pack(side=LEFT)
-            Button(F1_A,text="Gris Oscuro",relief=GROOVE,command=lambda:self.putcolor("#5E5E5E"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#D0D0D0").pack(side=LEFT)
-            Button(F1_B,text="Gris Claro",relief=GROOVE,command=lambda:self.putcolor("#D0D0D0"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            F1_A = Frame(F1,border=1)
-            F1_A.pack(side=LEFT)
-            Canvas(F1_A,width=30,height=23,bg="#000000").pack(side=LEFT)
-            Button(F1_A,text="Negro",relief=GROOVE,command=lambda:self.putcolor("#000000"),width=13).pack(side=LEFT)
-            Label(F1_A,text="",).pack()
-            F1_B = Frame(F1,border=1)
-            F1_B.pack()
-            Canvas(F1_B,width=30,height=23,bg="#ffffff").pack(side=LEFT)
-            Button(F1_B,text="Blanco",relief=GROOVE,command=lambda:self.putcolor("#FFFFFF"),width=13).pack()
-            
-            #Nueva linea de colores
-            F1 = Frame(self.root)
-            F1.pack()
-            Button(F1,text="Color Personalizado",relief=GROOVE,command=self.colorPersonalizado,width=17).pack()
-            
-            Label(self.root,text="").pack()
-            F1 = Frame(self.root,border=4)
-            F1.pack()
-            self.color=Label(F1,width=10,text="Elija un color")
-            self.color.pack(side=LEFT)
-            Label(F1,text="     ").pack(side=LEFT)
-            enviar = Button(F1,text="Listo",command=self.root.destroy)
-            enviar.pack()
-        
-        #Create Color
-        if type_win=="createColor":
-            Label(self.root,text="Crear un color (RGB)",font=DEFAULT_FONT_TITLE,border=10).pack()
-            
-            #Nueva linea de colores
-            FA = Frame(self.root)
-            FA.pack()
-            F = Frame(FA)
-            F.pack(side=LEFT)
-            F1 = Frame(F)
-            F1.pack()       
-            Label(F1,text="Rojo [0-255]",width=15,justify=RIGHT).pack(side=LEFT)
-            self.R = Entry(F1,width=4)
-            self.R.bind("<Key>",self.crearColor)
-            self.R.pack()
-            
-            F2 = Frame(F)
-            F2.pack()       
-            Label(F2,text="Verde [0-255]",width=15).pack(side=LEFT)
-            self.V = Entry(F2,width=4)
-            self.V.bind("<Key>",self.crearColor)
-            self.V.pack()
-            
-            F3 = Frame(F)
-            F3.pack()       
-            Label(F3,text="Azul [0-255]",width=15).pack(side=LEFT)
-            self.A = Entry(F3,width=4)
-            self.A.bind("<Key>",self.crearColor)
-            self.A.pack()
-            
-            FB = Frame(FA,border=10)
-            FB.pack()
-            self.paleta = Canvas(FB,width=100,height=70,relief=GROOVE,border=1)
-            self.paleta.pack()
-            
-            Label(self.root,text="").pack()
-            FF = Frame(self.root,border=4)
-            FF.pack()
-            self.color=Label(FF,width=30,text="Elija un color")
-            self.color.pack(side=LEFT)
-            Label(FF,text="     ").pack(side=LEFT)
-            self.enviarb = Button(FF,text="Crear",command=self.root.destroy,state=DISABLED)
-            self.enviarb.pack()
-            
+         
         #Weight of Tools
         if type_win=="weight":
             Label(self.root,text="Weight",font=DEFAULT_FONT_TITLE,border=10).pack()
@@ -513,7 +309,7 @@ class pyv:
         #Menu insert figure
         if type_win=="insertfigure":
             Label(self.root,text="Insert figure",font=DEFAULT_FONT_TITLE,border=10).pack()
-            Button(self.root, text="Arch",command=lambda:self.enviarFigura("arch"),width=10,relief=GROOVE).pack()
+            Button(self.root, text="Arc",command=lambda:self.enviarFigura("arc"),width=10,relief=GROOVE).pack()
             Button(self.root, text="Square",command=lambda:self.enviarFigura("square"),width=10,relief=GROOVE).pack()
             Button(self.root, text="Image",command=lambda:self.enviarFigura("image"),width=10,relief=GROOVE).pack()
             Button(self.root, text="Oval",command=lambda:self.enviarFigura("oval"),width=10,relief=GROOVE).pack()
@@ -549,7 +345,7 @@ class pyv:
             self.numvertices.focus_force()
             
         #Menu numero de vertices
-        if type_win=="arch":
+        if type_win=="arc":
             Label(self.root,text="Longitud del arco",font=DEFAULT_FONT_TITLE,border=10).pack()
             self.arc = Entry(self.root)
             self.arc.pack()

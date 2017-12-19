@@ -45,7 +45,7 @@ def image_test(image_test, database_images, algorithm_type, ransac_value):
 # arAppCompute('..\database\images\c\img1_01.jpg', 'surf', 0.6) 
 def arAppCompute(image_test_path, algorithm_type, ransac_value):
 
-    images_cv, feature_points, descriptors = load_fileImages_database()
+    images_cv, feature_points, descriptors = load_fileImages_database(algorithm_type)
     database_images = [images_cv, feature_points, descriptors]
     
     image_test(image_test_path, database_images, algorithm_type, ransac_value)
