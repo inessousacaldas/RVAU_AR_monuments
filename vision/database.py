@@ -68,7 +68,10 @@ def load_fileImages_database():
         print("no database for feature_points and descriptors", flush=True)
     elif len(file_list_image) < 1:
         print("no database for images cv", flush=True)
-    elif(len(file_list_keypoints) != len(file_list_image)):
+    elif(len(file_list_keypoints) != len(file_list_image) 
+        | len(file_list_keypoints) != len(file_list_descriptors)  
+        | len(file_list_image) != len(file_list_descriptors) ):
+
         print("database inconsistency", flush=True)
     else:
 
@@ -100,7 +103,7 @@ def load_fileImages_database():
         all_feature_points.append(feature_points)
         
         print("LOAD COMPLETO", flush=True)
-        return images_cv, all_feature_points, all_descriptors
+        return all_images_cv, all_feature_points, all_descriptors
 
 
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]

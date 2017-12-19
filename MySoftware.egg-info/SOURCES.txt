@@ -13,4 +13,5 @@ vision/ar_labeling.py
 vision/choose.py
 vision/database.py
 vision/feature_points.py
+vision/test.py
 vision/utils.py

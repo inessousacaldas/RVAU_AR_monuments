@@ -27,7 +27,6 @@ def calculate_matches(image_des, database_des):
     print("Calculating matches with the database images", flush=True)
     matches = []
     for db_des in database_des:
-        print("A matchar", flush=True)
         mat = compute_matches(db_des, image_des)
         matches.append(mat)
 
@@ -62,9 +61,12 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
         h,w = dst.shape
 
         result = cv2.warpPerspective(coloredLayerAr, M,(w,h))
-
-    #TODO
-    #merge = cv2.addWeighted(layerAR_img,0.5,src,0.5,0)
+    
+    print('shape', flush=True)
+    print(layerAR_img.shape, flush=True)
+    print(src.shape, flush=True)
+    src_gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
+    merge = cv2.addWeighted(layerAR_img,0.5,src_gray,0.5,0)
     
     merge_final = blend_transparent(dst_rgb, result)
 
@@ -72,11 +74,11 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
     cv2.resizeWindow('res', 300, 300)
     cv2.imshow('res',result)
 
-    """
+ 
     cv2.namedWindow('merge_ori', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('merge_ori', 300, 300)
     cv2.imshow('merge_ori',merge)
-    """
+ 
 
     cv2.namedWindow('merge', cv2.WINDOW_KEEPRATIO)
     cv2.resizeWindow('merge', 300, 300)

@@ -2,7 +2,8 @@ from lib import *
 from pyv import *
 from PIL import ImageTk, Image
 import pickle
-
+import tkinter.ttk as ttk
+from tkinter import colorchooser
 from vision.choose import select_region
 from vision.ar_labeling import arAppCompute
 
@@ -19,6 +20,7 @@ DATASAVES = DATAFOLDER+"saves/"
 DATADOCS = DATAFOLDER+"docs/"
 DATALANG = DATAFOLDER+"langs/"
 DATAICONS = DATAFOLDER+"icons/"
+TEST_PATH = '../database/sample/'
 
 #Program Information
 VERSION = 5.0,1.0
@@ -29,7 +31,7 @@ PROGRAM_TITLE = "MonumentAR"
 CONFIGURATION_FILE = PROGRAM_TITLE+".ini"
 
 #Default configuration
-C_DATA = [[1024, 768],"#000000","#FFFFFF","#FFFFFF",[5,5,[1,1],0,"miter"],20,3,"EN"]
+C_DATA = [[1024, 768],"#000000","#FFFFFF","#FFFFFF",[5,5,[1,1],0,"miter"],2,3,"EN"]
 
 #Load Settings and Update C_DATA
 try:
@@ -81,6 +83,9 @@ DEFAULT_BACKGROUND = C_DATA[3]
 DEFAULT_TOOL_STYLE = C_DATA[4]
 DEFAULT_TOOL_WEIGHT = C_DATA[5]
 DEFAULT_TOOL = C_DATA[6]
+BACKGROUND_WINDOW = '#37474F'
+BUTTONS_COLOR = '#455A64'
+
 
 #Class paint
 class Paint:
@@ -106,16 +111,23 @@ class Paint:
             self.draw = False
             self.mainArchive = ""
             self.imageBackgroundPath = ""
+            
             #Window Creation
             self.main = Tk()
+            style = ttk.Style()
+            #style.configure('TButton', background='black')
+            #style.configure('TButton', foreground='green')
+            #('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
+            style.theme_use("xpnative")
+            print(style.theme_names())
             self.main.focus_force()
-            print(PROGRAM_SIZE)
             self.main.geometry('%dx%d+%d+%d' % (PROGRAM_SIZE[0], PROGRAM_SIZE[1], (self.main.winfo_screenwidth() - PROGRAM_SIZE[0])/2,\
                                                  (self.main.winfo_screenheight() - PROGRAM_SIZE[1])/2))
             self.main.title(PROGRAM_TITLE)
             self.main.iconbitmap(DATAICONS+"coloricon.ico")
             self.main.minsize(PROGRAM_SIZE[0], PROGRAM_SIZE[1])
             self.main.resizable(width=False, height=False)
+            
             
 
             #Window events
@@ -133,7 +145,7 @@ class Paint:
             #Menu
             menuBar = Menu(self.main)
             self.main.config(menu=menuBar)
-
+            
             #File
             fileMenu = Menu(menuBar,tearoff=0)
             fileMenu.add_command(label="New    [Ctrl-N]",command=self.newImage)
@@ -184,17 +196,15 @@ class Paint:
             """
 
             #Draw Frame
-            ParentFrame = Frame(self.main)
+            ParentFrame = Frame(self.main, background=BACKGROUND_WINDOW)
             ParentFrame.grid()
-
+            
             #Draw Canvas
-            windowFrame = Frame(ParentFrame)
-            #windowFrame.pack(side=LEFT)
+            windowFrame = Frame(ParentFrame, background=BACKGROUND_WINDOW)
             windowFrame.grid_rowconfigure(0, weight=1)
             windowFrame.grid_columnconfigure(0, weight=1)
             windowFrame.grid(row=0, column=0, sticky="nsew")
-            windowFrame2 = Frame(ParentFrame)
-            #windowFrame2.pack()
+            windowFrame2 = Frame(ParentFrame, background=BACKGROUND_WINDOW)
             windowFrame2.grid_rowconfigure(0, weight=1)
             windowFrame2.grid_columnconfigure(0, weight=1)
             windowFrame2.grid(row=0, column=0, sticky="nsew")
@@ -206,50 +216,49 @@ class Paint:
             
             self.screen.grid()
             self.screenSave.grid()
-            #self.screen.pack(expand = YES, fill = BOTH)
-            #self.screenSave.pack(expand = YES, fill = BOTH)
+
             
             #Buttons
-            Buttonframe = Frame(ParentFrame,border=5)
+            Buttonframe = Frame(ParentFrame,border=5, background=BACKGROUND_WINDOW)
             Buttonframe.grid(row=0, column=1, sticky="NW")
             Label(Buttonframe,text="tools",border=10).pack()
-            Button(Buttonframe,text="Eraser",relief=GROOVE,width=20,command=lambda:self.tools("eraser")).pack()
-            Button(Buttonframe,text="Pencil",relief=GROOVE,width=20,command=lambda:self.tools("pencil")).pack()
-            Button(Buttonframe,text="Thin Brush",relief=GROOVE,width=20,command=lambda:self.tools("brushthin")).pack()
-            Button(Buttonframe,text="Thick Brush",relief=GROOVE,width=20,command=lambda:self.tools("brushthick")).pack()
-            Button(Buttonframe,text="Insert Object",relief=GROOVE,width=20,command=self.insertFigureMenu).pack()
+            ttk.Button(Buttonframe,text="Eraser",width=20,command=lambda:self.tools("eraser"), style="TButton").pack()
+            ttk.Button(Buttonframe,text="Pencil",width=20,command=lambda:self.tools("pencil")).pack()
+            ttk.Button(Buttonframe,text="Thin Brush",width=20,command=lambda:self.tools("brushthin")).pack()
+            ttk.Button(Buttonframe,text="Thick Brush",width=20,command=lambda:self.tools("brushthick")).pack()
+            ttk.Button(Buttonframe,text="Insert Object",width=20,command=self.insertFigureMenu).pack()
 
             #Tools info
             Label(Buttonframe,text="tools",border=10).pack()
-            WeightPencil = Frame(Buttonframe)
+            WeightPencil = Frame(Buttonframe, background=BACKGROUND_WINDOW)
             WeightPencil.pack()
             self.infoWeightPencil = Label(WeightPencil,text=str(self.toolWeight),border=3,font=10,width=2)
             self.infoWeightPencil.pack(side=LEFT)
             Label(WeightPencil,text="  ").pack(side=LEFT)
-            Button(WeightPencil,text="Weight",relief=GROOVE,command=self.toolWeightChange,width=9).pack()
-            PencilStyle = Frame(Buttonframe)
+            ttk.Button(WeightPencil,text="Weight",command=self.toolWeightChange,width=9).pack()
+            PencilStyle = Frame(Buttonframe, background=BACKGROUND_WINDOW)
             PencilStyle.pack()
             Label(PencilStyle,text=" ",border=3,font=10,width=2).pack(side=LEFT)
             Label(PencilStyle,text="  ").pack(side=LEFT)
-            Button(PencilStyle,text="Style",relief=GROOVE,command=self.styleToolChange,width=9).pack()
+            ttk.Button(PencilStyle,text="Style",command=self.styleToolChange,width=9).pack()
 
             #Color Information
             Label(Buttonframe,text="Colors",border=10).pack()
-            activeColor = Frame(Buttonframe)
+            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
             activeColor.pack()
             self.infoactivedcolor = Canvas(activeColor,width=30,height=20,bg=self.activeColor)
             self.infoactivedcolor.pack(side=LEFT)
-            Button(activeColor,text="Tool",relief=FLAT,command=lambda:self.colorChange("active"),width=10).pack()
-            activeColor = Frame(Buttonframe)
+            ttk.Button(activeColor,text="Tool",command=lambda:self.colorChange("active"),width=10).pack()
+            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
             activeColor.pack()
             self.infoactivedbackgroundcolor = Canvas(activeColor,width=30,height=20,bg=self.backgroundColor)
             self.infoactivedbackgroundcolor.pack(side=LEFT)
-            Button(activeColor,text="Background",relief=FLAT,command=lambda:self.colorChange("background"),width=10).pack()
-            activeColor = Frame(Buttonframe)
+            ttk.Button(activeColor,text="Color2",command=lambda:self.colorChange("background"),width=10).pack()
+            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
             activeColor.pack()
             self.infoactivedcoloreraser = Canvas(activeColor,width=30,height=20,bg=self.eraserColor)
             self.infoactivedcoloreraser.pack(side=LEFT)
-            Button(activeColor,text="Eraser",relief=FLAT,command=lambda:self.colorChange("eraser"),width=10).pack()
+            ttk.Button(activeColor,text="Eraser",command=lambda:self.colorChange("eraser"),width=10).pack()
 
             #Info for user
             Label(Buttonframe,height=1).pack()
@@ -258,8 +267,8 @@ class Paint:
 
             #Vision
             Label(Buttonframe,text="Vision",border=10).pack()
-            Button(Buttonframe,text="Key Points",relief=GROOVE,width=20,command=self.computeKeyPoints).pack()
-            Button(Buttonframe,text="Test image",relief=GROOVE,width=20,command=self.arApp).pack()
+            ttk.Button(Buttonframe,text="Key Points",width=20,command=self.computeKeyPoints).pack()
+            ttk.Button(Buttonframe,text="Test image",width=20,command=self.arApp).pack()
 
             #Init functions indev
             self.tools(self.activeTool)
@@ -598,7 +607,7 @@ class Paint:
 
     def arApp(self):
         print("ArAPP", flush=True)
-        filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+        filepath = askopenfilename(title="Open",initialdir=TEST_PATH,defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
         self.messageUser.config(text="")
         #if filepath!="" and (filepath[len(filepath)-4:len(filepath)]==".jpg" or filepath[len(filepath)-4:len(filepath)]==".gif"):
         if filepath!="":

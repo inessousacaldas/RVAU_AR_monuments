@@ -1,5 +1,5 @@
+from __future__ import print_function
 from PIL import Image
-
 from vision.database import load_database, load_fileImages_database
 from vision.feature_points import *
 from vision.utils import get_image_layerAR
@@ -14,8 +14,6 @@ def image_test(image_test, database_images):
 
     image = [img, kp, des]
     
-    print(len(database_images[2]), flush=True)
-    print("Macacos a dancar", flush=True)
     #Calculates matches of image test with all images from database
     matches = calculate_matches(des, database_images[2])
 
@@ -37,14 +35,16 @@ def image_test(image_test, database_images):
     layerAR = get_image_layerAR(index_max)
 
     database_image = [database_images[0][index_max], database_images[1][index_max], database_images[2][index_max]]
+   
     compute_homography(image_test, image, database_image, layerAR, matches[index_max])
 
 
 def arAppCompute(image_test_path):
 
     images_cv, feature_points, descriptors = load_fileImages_database()
+    print(len(images_cv), len(feature_points), len(descriptors))
     database_images = [images_cv, feature_points, descriptors]
- 
+    
     image_test(image_test_path, database_images)
 
 def main():
