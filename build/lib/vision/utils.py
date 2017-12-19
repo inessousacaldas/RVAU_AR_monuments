@@ -5,8 +5,15 @@ from os.path import splitext, basename
 import cv2
 import numpy as np
 
-DATABASE_PATH = '..\database\images\*.jpg'
+DATABASE_PATH = '..\database\images\*'
 LAYER_AR_PATH = '..\database\layers\\'
+
+def get_number_of_files():
+
+    files = glob.glob(DATABASE_PATH)
+
+    return len(files)
+    
 
 def get_image_layerAR(index):
 
@@ -41,7 +48,6 @@ def blend_transparent(face_img, overlay_t_img):
 
     # And finally just add them together, and rescale it back to an 8bit integer image    
     return np.uint8(cv2.addWeighted(face_part, 255.0, overlay_part, 255.0, 0.0))
-
 
 def pickle_keypoints(keypoints):
     temp_array = []

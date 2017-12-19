@@ -6,7 +6,7 @@ import tkinter.ttk as ttk
 from tkinter import colorchooser
 from vision.choose import select_region
 from vision.ar_labeling import arAppCompute
-
+from vision.utils import get_number_of_files
 #Funciones intrinsecas de Paint
 def isNumerable(x):
     if x.strip().isdigit():
@@ -21,6 +21,8 @@ DATADOCS = DATAFOLDER+"docs/"
 DATALANG = DATAFOLDER+"langs/"
 DATAICONS = DATAFOLDER+"icons/"
 TEST_PATH = '../database/sample/'
+DATABASE_PATH = '../database/images/'
+DATABASE_LAYERS = '../database/layers/'
 
 #Program Information
 VERSION = 5.0,1.0
@@ -73,7 +75,7 @@ except:
 
 #Default constants
 DEFAULT_TITLE = "MonumentAR"
-DEFAULT_EXTENSION = ".is"
+DEFAULT_EXTENSION = ".eps"
 
 #Variables Configuration
 PROGRAM_SIZE = C_DATA[0]
@@ -114,9 +116,12 @@ class Paint:
             self.draw = False
             self.mainArchive = ""
             self.imageBackgroundPath = ""
+            self.layerName = ""
             #Elements draw on canvas
             self.stackElements = []
             self.stackElementsSave = []
+            #Database images
+            self.sizeDatabase = get_number_of_files()
 
             #Window Creation
             self.main = Tk()
@@ -217,7 +222,8 @@ class Paint:
             
             self.screen = Canvas(windowFrame,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND)
             self.screenSave = Canvas(windowFrame2,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND, relief="sunken")
-            
+            print('tam',PROGRAM_SIZE[0]*0.8)
+            print('tam2',PROGRAM_SIZE[1], flush=True)
             self.screen.grid()
             self.screenSave.grid()
 
@@ -440,10 +446,11 @@ class Paint:
             
             if txt.value!=0:
                 filename = DATASAVES+str(txt.value)+DEFAULT_EXTENSION
-        
-                self.screenSave.postscript(file=filename, colormode='color')
+                print('as', self.screenSave.size, flush=True)
+                self.screenSave.postscript(file=filename, colormode='color',  height = 770, pagewidth=819)
 
                 img = Image.open(filename)
+                print(img.size, flush=True)
                 self.saveLayer(img)
                 img.save(DATASAVES+str(txt.value) + '.png', 'png')
                 self.draw = False
@@ -467,7 +474,9 @@ class Paint:
             else:
                 newData.append(item)
         img.putdata(newData)
-        img.save("TransparentImage.png", "PNG")#converted Image name
+        layerPath = DATABASE_LAYERS + self.layerName + '_layer.png'
+        print('n', layerPath, flush=True)
+        img.save(layerPath, "PNG")#converted Image name
 
     #exit the program
     def exit(self,i="null"):
@@ -481,7 +490,6 @@ class Paint:
     #Save Color Tools    - active, eraser
     def colorChange(self,tools):
         color = askcolor()
-        print("aa", color[1], flush = True)
         color = color[1]
         if color!=0:
             if tools=="active":
@@ -606,20 +614,26 @@ class Paint:
             self.screen.bind("<B1-Motion>",self.drawFigure)
             self.activeFigure = ARC
             self.messageUser.config(text="Drag to create arc")   
+        
         if figura=="image":
-            self.messageUser.config(text="Ingrese la ubicacion de su imagen")
+            self.messageUser.config(text="Enter the location of your image.")
             filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
             self.messageUser.config(text="")
-            #if filepath!="" and (filepath[len(filepath)-4:len(filepath)]==".jpg" or filepath[len(filepath)-4:len(filepath)]==".gif"):
-            if filepath!="":
+            if filepath!="": #TODO see if image file
                 self.mainArchive=filepath
-                print(filepath, flush=True)
-
-                self.imageBackgroundPath = filepath
-                image = Image.open(filepath)
-                image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
-                image = ImageTk.PhotoImage(image)
                 
+                print('database ', self.sizeDatabase)
+                filename, file_extension = os.path.splitext(filepath)
+                print(file_extension, flush=True)
+
+                image = Image.open(filepath)                
+                image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
+                name = DATABASE_PATH + 'img' + str(self.sizeDatabase) + file_extension
+                image.save(name)
+                self.imageBackgroundPath = name
+                self.layerName = 'img' + str(self.sizeDatabase)
+                image = ImageTk.PhotoImage(image)
+               
                 self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
                 
                 self.main.mainloop(0)

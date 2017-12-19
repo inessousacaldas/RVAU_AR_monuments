@@ -48,7 +48,10 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
     #Images openCV
     src = database_image[0]
     dst = test_image[0]
-
+    cv2.namedWindow('s', cv2.WINDOW_KEEPRATIO)
+    cv2.resizeWindow('s', 300, 300)
+    cv2.imshow('s',layerAR_img)
+    cv2.waitKey(0)
     #Keypoints
     kp_database_image = database_image[1]
     kp_test_image = test_image[1]
@@ -69,8 +72,11 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
         result = cv2.warpPerspective(coloredLayerAr, M,(w,h))
     
         # show findings
-
+        print(layerAR_img.shape, flush=True)
+        print(src.shape, flush=True)
         src_gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
+        print(layerAR_img.shape, flush=True)
+        print(src.shape, flush=True)
         merge = cv2.addWeighted(layerAR_img,0.5,src_gray,0.5,0)
         
         merge_final = blend_transparent(dst_rgb, result)

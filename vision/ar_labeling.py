@@ -37,7 +37,7 @@ def image_test(image_test, database_images, algorithm_type, ransac_value):
     layerAR = get_image_layerAR(index_max)
 
     database_image = [database_images[0][index_max], database_images[1][index_max], database_images[2][index_max]]
-   
+    
     compute_homography(image_test, image, database_image, layerAR, matches[index_max], ransac_value)
 
 # compute the test image and show the findings 
