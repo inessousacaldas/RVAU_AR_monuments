@@ -2,7 +2,6 @@ from PIL import Image
 import glob
 from vision.feature_points import calculate_feature_points
 import pickle
-import cv2
 import os.path
 import errno
 from os.path import splitext, basename
@@ -105,7 +104,7 @@ def load_fileImages_database():
         print("LOAD COMPLETO", flush=True)
         return all_images_cv, all_feature_points, all_descriptors
 
-
+"""
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
 def create_database():
     
@@ -163,5 +162,5 @@ def load_database():
         feature_points.append(temp_feature)
     
     return images_cv, feature_points, descriptors
-    
+"""    
     

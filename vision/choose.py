@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from vision.database import create_file_database
 
+# Computes the mask select by the user
 def applyMask(img, r):
     
     # Create the basic black image 
@@ -29,8 +30,9 @@ def applyMask(img, r):
 
     return res
 
-
-def select_region(image_path):
+# Calculates the Keypoints and the descriptors of the selected mask, and store them into the respective files
+# Needs the algorithm type
+def select_region(image_path, algorithm_type):
  
     # Read image
     im = cv2.imread(image_path)
@@ -46,10 +48,23 @@ def select_region(image_path):
     cv2.destroyAllWindows()
     gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
     
-    # Initiate SIFT detector
-    sift = cv2.xfeatures2d.SIFT_create()
 
-    # find the keypoints and descriptors with SIFT
-    kp1, des1 = sift.detectAndCompute(gray,None)
+    if algorithm_type == 'sift':    
+        print('sift algorithm',flush=True)
+        # Initiate SIFT detector
+        sift = cv2.xfeatures2d.SIFT_create()
+        # find the keypoints and descriptors with SIFT
+        kp1, des1 = sift.detectAndCompute(gray,None)
+        print('kp %s desc %s ' % (len(kp1),len(des1)) ,flush=True)
+        create_file_database(image_path, im, kp1,des1)
+    
+    elif algorithm_type == 'surf':
+        print('surf algorithm',flush=True)
+        print('Hessian Threshold = 400',flush=True)
+        surf = cv2.xfeatures2d.SURF_create(400)
+        # Find keypoints and descriptors directly
+        kp, des = surf.detectAndCompute(gray,None)
+        print('kp %s desc %s ' % (len(kp),len(des)) ,flush=True)
+        create_file_database(image_path, im, kp,des)
 
-    create_file_database(image_path, im, kp1,des1)
+#select_region('..\database\images\c\img1_01.jpg', 'sift')
