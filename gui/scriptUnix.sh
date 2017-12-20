@@ -1,3 +1,4 @@
+#!/bin/sh
 echo -e "\nMonumentAR Application\n"
 
 cd ..

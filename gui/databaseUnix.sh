@@ -1,3 +1,4 @@
+#!/bin/sh
 echo database
 
 cd ../database/vision/surf/descriptors
