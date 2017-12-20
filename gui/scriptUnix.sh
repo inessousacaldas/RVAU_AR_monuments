@@ -11,5 +11,8 @@ sleep 1
 
 python paint.py
 
-ECHO done
-
+ECHO.
+ECHO See you later
+ECHO.
+ECHO Authors: Ines Caldas and Joel Carneiro
+ECHO.
