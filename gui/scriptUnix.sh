@@ -1,5 +1,4 @@
-ECHO OFF
-ECHO script
+echo -e "\nMonumentAR Application\n"
 
 cd ..
 python setup.py install
@@ -11,8 +10,8 @@ sleep 1
 
 python paint.py
 
+echo -e "\nSee you later\n"
 
-ECHO \nSee you later\n
+echo -e "\nAuthors: \n\nInes Caldas\n \nJoel Carneiro\n"
 
-ECHO Authors: \nInes Caldas \nJoel Carneiro\n
 

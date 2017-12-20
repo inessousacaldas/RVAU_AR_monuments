@@ -1,5 +1,4 @@
-ECHO OFF
-ECHO database
+echo database
 
 cd ../database/vision/surf/descriptors
 rm *
@@ -23,5 +22,6 @@ rm *
 
 cd ../../gui
 
+echo -e "\nDatabase cleaned\n"
 
-ECHO \nDatabase cleaned\n
+
