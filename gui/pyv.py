@@ -16,13 +16,16 @@ DEFAULT_WIDTH_CANVASTREE = 38,30
 def valueBetween(num,x,y):
     if (num>=x) and (num<=y): return True
     else: return False
+
+
+class pyvi:
     
-#Clase create windwos
-class pyv:
     
     #Constructor
-    def __init__(self,title,icon,type_win,size,properties=[0,0,0,0,0]):
-        self.root = Tk()
+    def __init__(self,master, title,icon,type_win,size, properties=[0,0,0,0,0]):
+        self.master = master
+        self.root = tkinter.Toplevel(master)
+        #tkinter.Toplevel(self.root)
         self.value = 0
         
         self.root.geometry('%dx%d+%d+%d' % (size[0], size[1], (self.root.winfo_screenwidth() - size[0])/2,\
@@ -31,7 +34,63 @@ class pyv:
         self.root.title(title)
         self.root.minsize(width=size[0], height=size[1])
         self.root.resizable(width=False, height=False)
-         
+
+        if type_win == 'icons':
+            
+            F = Frame(self.root)
+            F.pack()
+
+            FiguresInsert = Frame(F)
+            FiguresInsert.pack()
+        
+            
+            files = glob.glob('Data\icons_gui\*')
+            
+            i,j = 0,0
+            n = 0
+            b_lines = [None]*len(files)
+            images = [None]*len(files)   
+            for icon_file in files:
+                b_lines[n] = ttk.Button(FiguresInsert,text="Insert Icon", command=lambda icon_file=icon_file:self.sendIcon(icon_file), width=20, style="TButton")
+                images[n] = Image.open(icon_file)
+                images[n] = images[n].resize((32,32), Image.ANTIALIAS)
+                images[n] = ImageTk.PhotoImage(images[n])
+                b_lines[n].config(image=images[n])
+                b_lines[n].image = images[n]
+                b_lines[n].grid(row=j, column=i)
+                
+                n = n + 1
+                i = i + 1
+                if(i > 4):
+                    i = 0
+                    j = j + 1
+            
+            b_cancel = ttk.Button(FiguresInsert, text="Cancel",command=lambda:self.sendIcon(None),width=10)
+            b_cancel.grid(columnspan = 5, pady = 10)
+
+    def sendIcon(self, filepath):
+        
+        self.value = filepath
+        self.root.quit()
+        self.root.destroy()
+
+#Clase create windwos
+class pyv:
+    
+    
+    #Constructor
+    def __init__(self,title,icon,type_win,size,properties=[0,0,0,0,0]):
+        self.root = tkinter.Tk()
+        #tkinter.Toplevel(self.root)
+        self.value = 0
+        
+        self.root.geometry('%dx%d+%d+%d' % (size[0], size[1], (self.root.winfo_screenwidth() - size[0])/2,\
+                                             (self.root.winfo_screenheight() - size[1])/2))
+        self.root.iconbitmap(bitmap=icon)
+        self.root.title(title)
+        self.root.minsize(width=size[0], height=size[1])
+        self.root.resizable(width=False, height=False)
+        
         #Weight of Tools
         if type_win=="weight":
             Label(self.root,text="Weight",font=DEFAULT_FONT_TITLE,border=10).pack()
@@ -265,7 +324,7 @@ class pyv:
             Button(FA,text="Weight 24",relief=GROOVE,command=lambda:self.weight(24),width=7).pack()
             
         if type_win=="style":
-            self.estiloValues = properties
+            self.styleValues = properties
             Label(self.root,text="Tool Style",font=DEFAULT_FONT_TITLE,border=10).pack()
             
             #New line
@@ -391,24 +450,23 @@ class pyv:
             archivo.close()
         
         if type_win == 'icons':
+            
             F = Frame(self.root)
             F.pack()
-            
+
             FiguresInsert = Frame(F)
             FiguresInsert.pack()
+        
             
             files = glob.glob('Data\icons_gui\*')
-
-            i,j = 0,0
             
-            print('aaa')
-            
+            i,j = 0,0          
             for icon_file in files:
             
-                b_line = ttk.Button(FiguresInsert,text="Insert Icons", command=lambda:self.sendIcon(icon_file), width=20, style="TButton")
+                b_line = ttk.Button(FiguresInsert,text="Insert Icon", command=lambda:self.sendIcon(icon_file), width=20, style="TButton")
                 images = Image.open(icon_file)
                 images = images.resize((32,32), Image.ANTIALIAS)
-                images = ImageTk.PhotoImage(images)
+                images = ImageTk.PhotoImage(file='Data\icons_gui\\test.gif')
                 b_line.config(image=images)
                 b_line.image = images
                 b_line.grid(row=j, column=i)
@@ -418,10 +476,9 @@ class pyv:
                     i = 0
                     j = j + 1
             
-            b_cancel = ttk.Button(FiguresInsert, text="No",command=lambda:self.sendIcon("no"),width=5)
-            b_cancel.grid(columnspan = 5, pady = 10)
-
-           
+            #b_cancel = ttk.Button(FiguresInsert, text="No",command=lambda:self.sendIcon("no"),width=5)
+            #b_cancel.grid(columnspan = 5, pady = 10)
+            
 
     #Asignar un numero de vertices para dibujar
     def sendIcon(self, filepath):
@@ -461,10 +518,10 @@ class pyv:
         join = self.JOIN.get().lower()
         if x.isdigit() and x!="":
             x= int(x)
-            if x>0: self.estiloValues[0]=x
+            if x>0: self.styleValues[0]=x
         if y.isdigit() and y!="":
             y=int(y)
-            if y>0: self.estiloValues[1]=y
+            if y>0: self.styleValues[1]=y
         if dash.replace(",","").replace(" ","").isdigit():
             dash = dash.split(",")
             k=0
@@ -473,20 +530,20 @@ class pyv:
                 if not valueBetween(int(i),1,255): k+=1
                 dash[j]=int(dash[j])
                 j+=1
-            if k==0: self.estiloValues[2]=dash
+            if k==0: self.styleValues[2]=dash
         if smooth.isdigit() and smooth!="":
             smooth=int(smooth)
-            if valueBetween(smooth,0,1): self.estiloValues[3]=smooth
-        if join=="miter" or join=="bevel" or join=="round": self.estiloValues[4]=join       
+            if valueBetween(smooth,0,1): self.styleValues[3]=smooth
+        if join=="miter" or join=="bevel" or join=="round": self.styleValues[4]=join       
         self.root.destroy()
         
     #Restaurar el estilo
     def restaurarEstilo(self):
-        self.estiloValues[0]=self.defaultProperties[0]
-        self.estiloValues[1]=self.defaultProperties[1]
-        self.estiloValues[2]=self.defaultProperties[2]
-        self.estiloValues[3]=self.defaultProperties[3]
-        self.estiloValues[4]=self.defaultProperties[4]
+        self.styleValues[0]=self.defaultProperties[0]
+        self.styleValues[1]=self.defaultProperties[1]
+        self.styleValues[2]=self.defaultProperties[2]
+        self.styleValues[3]=self.defaultProperties[3]
+        self.styleValues[4]=self.defaultProperties[4]
         self.root.destroy()
         
     #Ingresar weightes

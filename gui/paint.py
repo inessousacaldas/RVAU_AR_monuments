@@ -339,6 +339,18 @@ class Paint:
             ttk.Button(Buttonframe,text="SIFT",width=20,command=lambda:self.arApp('sift')).pack()
             ttk.Button(Buttonframe,text="SURF",width=20,command=lambda:self.arApp('surf')).pack()
 
+
+            # add bindings for clicking, dragging and releasing over
+            # any object with the "icon" tag
+
+            # this data is used to keep track of an 
+            # item being dragged
+            self._drag_data = {"x": 0, "y": 0, "item": None, "itemSave": None}
+            self.screen.tag_bind("icon", "<ButtonPress-3>", self.on_icon_press)
+            self.screen.tag_bind("icon", "<ButtonRelease-3>", self.on_icon_release)
+            self.screen.tag_bind("icon", "<B3-Motion>", self.on_icon_motion)
+
+
             #Init functions indev
             self.tools(self.activeTool)
             self.screen.bind("<ButtonRelease-1>",self.posPointer)
@@ -525,12 +537,10 @@ class Paint:
 
     #Insert Icons
     def insertIcons(self,E=False):
-        a = pyv("Insert icons",DATAICONS+"shaperound.ico","icons",(230,460))
-        a.root.mainloop(1)  
-        self.addIcon(a.value)
+        a = pyvi(self.main, "Insert icons",DATAICONS+"shaperound.ico","icons", (230,460))
+        a.root.mainloop(0)  
+        self._create_icon(a.value)
     
-    def addIcon(self, value):
-        print('icon ', value, flush=True)
     #Insert Figures
     def insertFigureMenu(self,E=False):
         a = pyv("Insert Figure",DATAICONS+"shaperound.ico","insertfigure",(260,230))
@@ -744,6 +754,55 @@ class Paint:
         self.stackElementsSave.append(elementS)
         self.draw = True
         self.lastx, self.lasty = x, y
+
+
+    #Icons Drag
+
+    def _create_icon(self, filepath):
+        if(filepath != None):
+            print('aqui',filepath, flush=True)
+            '''Create a icon at the given coordinate in the given color'''
+            # load the .gif image file
+            images = Image.open(filepath)
+            images = images.resize((64,64), Image.ANTIALIAS)
+            images = ImageTk.PhotoImage(images)
+            im = self.screen.create_image(PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="icon", state=NORMAL)
+            imSave = self.screenSave.create_image(PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="icon", state=NORMAL)
+            self.stackElements.append(im)
+            self.stackElementsSave.append(imSave)
+            #TODO
+            self.screen.repack()
+            #PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]
+            
+
+    def on_icon_press(self, event):
+        '''Begining drag of an object'''
+        # record the item and its location
+        self._drag_data["item"] = self.screen.find_closest(event.x, event.y)[0]
+        self._drag_data["itemSave"] = self.screenSave.find_closest(event.x, event.y)[0]
+        self._drag_data["x"] = event.x
+        self._drag_data["y"] = event.y
+
+    def on_icon_release(self, event):
+        '''End drag of an object'''
+        # reset the drag information
+        self._drag_data["item"] = None
+        self._drag_data["itemSave"] = None
+        self._drag_data["x"] = 0
+        self._drag_data["y"] = 0
+
+    def on_icon_motion(self, event):
+        if(self._drag_data["item"] != None):
+            '''Handle dragging of an object'''
+            # compute how much the mouse has moved
+            delta_x = event.x - self._drag_data["x"]
+            delta_y = event.y - self._drag_data["y"]
+            # move the object the appropriate amount
+            self.screen.move(self._drag_data["item"], delta_x, delta_y)
+            self.screenSave.move(self._drag_data["item"], delta_x, delta_y)
+            # record the new position
+            self._drag_data["x"] = event.x
+            self._drag_data["y"] = event.y
 
     ###########################
     #Vision
