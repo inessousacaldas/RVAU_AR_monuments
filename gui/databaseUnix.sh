@@ -15,8 +15,13 @@ rm *
 cd ../images
 rm *
 
-cd ../../../../gui
+cd ../../../images
+rm *
 
-ECHO.
-ECHO Database cleaned
-ECHO.
+cd ../layers
+rm *
+
+cd ../../gui
+
+
+ECHO \nDatabase cleaned\n

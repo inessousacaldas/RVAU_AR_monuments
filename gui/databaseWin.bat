@@ -16,7 +16,13 @@ del *
 cd ../images
 del *
 
-cd ../../../../gui
+cd ../../../images
+del *
+
+cd ../layers
+del *
+
+cd ../../gui
 
 ECHO.
 ECHO Database cleaned

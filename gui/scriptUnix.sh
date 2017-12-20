@@ -11,8 +11,8 @@ sleep 1
 
 python paint.py
 
-ECHO.
-ECHO See you later
-ECHO.
-ECHO Authors: Ines Caldas and Joel Carneiro
-ECHO.
+
+ECHO \nSee you later\n
+
+ECHO Authors: \nInes Caldas \nJoel Carneiro\n
+

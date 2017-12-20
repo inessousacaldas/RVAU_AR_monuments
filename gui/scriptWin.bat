@@ -14,6 +14,10 @@ python paint.py
 ECHO.
 ECHO See you later
 ECHO.
-ECHO Authors: Ines Caldas and Joel Carneiro
+ECHO Authors:
+ECHO.
+ECHO Ines Caldas 
+ECHO.
+ECHO Joel Carneiro
 ECHO.
 
