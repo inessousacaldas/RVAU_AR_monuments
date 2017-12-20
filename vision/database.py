@@ -137,7 +137,7 @@ def load_fileImages_database(type_alg):
                 temp_feature = unpickle_keypoints(list_kp)
                 feature_points.append(temp_feature)
             
-        all_feature_points.append(feature_points)
+            all_feature_points.append(feature_points)
         
         print("LOAD COMPLETO", flush=True)
         return all_images_cv, all_feature_points, all_descriptors

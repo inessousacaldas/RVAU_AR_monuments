@@ -222,8 +222,6 @@ class Paint:
             
             self.screen = Canvas(windowFrame,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND)
             self.screenSave = Canvas(windowFrame2,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND, relief="sunken")
-            print('tam',PROGRAM_SIZE[0]*0.8)
-            print('tam2',PROGRAM_SIZE[1], flush=True)
             self.screen.grid()
             self.screenSave.grid()
 
@@ -232,6 +230,8 @@ class Paint:
             Buttonframe.grid(row=0, column=1, sticky="NW")
             Label(Buttonframe,text="Tools",border=10).pack()
             
+            ttk.Button(Buttonframe,text="Insert Icons",width=20,command=self.insertIcons, style="TButton").pack()
+
             b_undo = ttk.Button(Buttonframe,text="Undo",width=20,command=self.undoElement, style="TButton")
             image_undo = Image.open(DATAICONS + "eraser.png")
             image_undo = image_undo.resize((32,32), Image.ANTIALIAS)
@@ -246,10 +246,8 @@ class Paint:
             b_pencil.config(image=image_pencil)
             b_pencil.pack()
 
-            
             ttk.Button(Buttonframe,text="Thin Brush",width=20,command=lambda:self.tools("brushthin"), style="TButton").pack()
-            
-            
+              
             ttk.Button(Buttonframe,text="Thick Brush",width=20,command=lambda:self.tools("brushthick"), style="TButton").pack()
             
             ttk.Button(Buttonframe,text="Insert Object",width=20,command=self.insertFigureMenu, style="TButton").pack()
@@ -286,8 +284,6 @@ class Paint:
             b_arc.config(image=image_arc)
             b_arc.pack(side=LEFT)
             
-            
-
             #Tools info
             Label(Buttonframe,text="tools",border=10).pack()
             WeightPencil = Frame(Buttonframe, background=BACKGROUND_WINDOW)
@@ -307,7 +303,7 @@ class Paint:
             Label(Buttonframe,text="Colors",border=10).pack()
             activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
             activeColor.pack()
-            self.infoactivedcolor = Canvas(activeColor,width=30,height=20,bg=self.activeColor)
+            self.infoactivedcolor = Canvas(activeColor,width=30,height=32,bg=self.activeColor)
             self.infoactivedcolor.pack(side=LEFT)
             
             b_color = ttk.Button(activeColor,text="Color 1",command=lambda:self.colorChange("active"),width=10)
@@ -526,6 +522,12 @@ class Paint:
         self.toolStyle[2] = a.styleValues[2]
         self.toolStyle[3] = a.styleValues[3]
         self.toolStyle[4] = a.styleValues[4]
+
+    #Insert Icons
+    def insertIcons(self,E=False):
+        a = pyv("Insert icons",DATAICONS+"shaperound.ico","icons",(230,500))
+        a.root.mainloop(1)
+        self.createFigure(a.value)
 
     #Insert Figures
     def insertFigureMenu(self,E=False):
