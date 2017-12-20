@@ -3,7 +3,10 @@
 
 from lib import *
 from tkinter.colorchooser import *
-
+import glob
+from PIL import ImageTk, Image
+import tkinter.ttk as ttk
+import tkinter
 #Important Variables
 DEFAULT_FONT_TITLE="Arial",10
 DEFAULT_WIDTH_CANVASTREE = 38,30
@@ -19,7 +22,8 @@ class pyv:
     #Constructor
     def __init__(self,title,icon,type_win,size,properties=[0,0,0,0,0]):
         self.value = 0
-        self.root = Tk()
+        self.root = tkinter.Toplevel()#Tk()
+        
         self.root.geometry('%dx%d+%d+%d' % (size[0], size[1], (self.root.winfo_screenwidth() - size[0])/2,\
                                              (self.root.winfo_screenheight() - size[1])/2))
         self.root.iconbitmap(bitmap=icon)
@@ -384,6 +388,38 @@ class pyv:
             Yscroll.config(command=texto.yview)
             archivo.close()
         
+        if type_win == 'icons':
+            F = Frame(self.root)
+            F.pack()
+            
+            FiguresInsert = Frame(F)
+            FiguresInsert.pack()
+
+            files = glob.glob('Data\icons_gui\*')
+
+            i,j = 0,0
+
+            for icon_file in files:
+            
+                b_line = ttk.Button(FiguresInsert,text="Insert Icons",width=20, style="TButton")
+                images = Image.open(icon_file)
+                images = images.resize((32,32), Image.ANTIALIAS)
+                images = ImageTk.PhotoImage(images)
+                b_line.config(image=images)
+                b_line.image = images
+                b_line.grid(row=j, column=i)
+
+                i = i + 1
+                if(i > 4):
+                    i = 0
+                    j = j + 1
+
+
+            print('icons')
+
+            Button(F, text="Cancel",command=lambda:self.response("yes"),width=5,relief=GROOVE).pack()
+    
+    
     #Ingresa colores programados
     def putcolor(self,colorText):
         self.color.config(text=colorText)
