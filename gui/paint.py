@@ -525,14 +525,18 @@ class Paint:
 
     #Insert Icons
     def insertIcons(self,E=False):
-        a = pyv("Insert icons",DATAICONS+"shaperound.ico","icons",(230,500))
-        a.root.mainloop(1)
-        self.createFigure(a.value)
-
+        a = pyv("Insert icons",DATAICONS+"shaperound.ico","icons",(230,460))
+        a.root.mainloop(1)  
+        self.addIcon(a.value)
+    
+    def addIcon(self, value):
+        print('icon ', value, flush=True)
     #Insert Figures
     def insertFigureMenu(self,E=False):
         a = pyv("Insert Figure",DATAICONS+"shaperound.ico","insertfigure",(260,230))
+        print('aqui', a.value, flush=True)
         a.root.mainloop(1)
+        print('aqui', a.value, flush=True)
         self.createFigure(a.value)
 
     #Retornar la posicion del mouse en dos posiciones y crear alguna figurilla
