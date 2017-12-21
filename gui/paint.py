@@ -490,7 +490,6 @@ class Paint:
                 img.save(DATASAVES+str(txt.value) + '.png', 'png')
                 self.draw = False
 
-    
     #Save layer AR
     def saveLayer(self, img):
         img = img.convert("RGBA")
@@ -518,7 +517,12 @@ class Paint:
     #Save Color Tools    - active, eraser
     def colorChange(self,tools):
         color = askcolor()
+        print('color', color[1], flush=True)
         color = color[1]
+        if((color == '#ffffff' ) | (color == '#FFFFFF')):
+            print('white', flush=True)
+            color = '#fefefe'
+            
         if color!=0:
             if tools=="active":
                 self.activeColor = color
@@ -837,11 +841,9 @@ class Paint:
             self.main.mainloop()
 
     def seeDatabase(self):
-        print('see database', flush=True)
         database = showDatabase(self.main, DATABASE_PATH, DATABASE_LAYERS)
         database.root.mainloop(0)  
         if(database.value != None):
-            print('val', database.value[0], database.value[1], flush=True)
             if(database.value[0] == 'edit'):
                 self.editLayer(database.value[1])
             elif(database.value[0] == 'delete'):
@@ -886,7 +888,6 @@ class Paint:
 
         vdb.deleteImageFromDatabase(base_file, name)
   
-
     def cleanCanvas(self):
         self.imageBackground = None
         self.imageBackgroundPath = ""
@@ -903,7 +904,6 @@ class Paint:
         self.screenSave.update()
 
         self.main.mainloop(0)
-
 
     def computeKeyPoints(self):
         print("Aqui", flush=True)
@@ -924,5 +924,5 @@ class Paint:
             arAppCompute(filepath, algorithm, 0.6)
 
 
-#Se carga la clase Paint
+#Run class Paint
 Paint()
