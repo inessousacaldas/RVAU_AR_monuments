@@ -550,37 +550,7 @@ class pyv:
     def weight(self,weightLine):
         self.value = weightLine
         self.root.destroy()
-    
-    #Funcion para crear un color hexadecimal
-    def crearColor(self,X):
-        r = self.R.get()
-        g = self.V.get()
-        b = self.A.get()
-        if r!="" and g!="" and b!="":
-            if r.isdigit() and g.isdigit() and b.isdigit():
-                r = int(r)
-                g = int(g)
-                b = int(b)
-                if valueBetween(r,0,255) and valueBetween(g,0,255) and valueBetween(b,0,255):
-                    hr = hex(r).replace("0x","").zfill(2)
-                    hg = hex(g).replace("0x","").zfill(2)
-                    hb = hex(b).replace("0x","").zfill(2)
-                    hexcolor = ("#"+hr+hg+hb).upper()
-                    self.paleta.config(bg=hexcolor)
-                    self.color.config(text=hexcolor)
-                    self.value = hexcolor
-                    self.enviarb.config(state=NORMAL)
-                else:
-                    self.enviarb.config(state=DISABLED)
-                    self.color.config(text="ERROR, VALORES ENTRE [0,255]")
-                    lib("sonido","minimo")
-            else:
-                self.color.config(text="ERROR, VALORES DEBEN SER DIGITOS")
-                lib("sonido","minimo")
-                self.enviarb.config(state=DISABLED) 
-        else:
-            self.enviarb.config(state=DISABLED)
-            self.color.config(text="Elija un color")       
+     
         
     #Ingresar color personalizado
     def colorPersonalizado(self):

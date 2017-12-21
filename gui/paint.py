@@ -3,6 +3,8 @@ from PIL import ImageTk, Image
 import pickle
 import tkinter.ttk as ttk
 from tkinter import colorchooser
+import tkinter.font as tkFont
+
 from os.path import basename
 
 from vision.choose import select_region
@@ -94,7 +96,7 @@ DEFAULT_TOOL_WEIGHT = C_DATA[5]
 DEFAULT_TOOL = C_DATA[6]
 
 
-LINE, OVAL, RECTANGLE, ARC = list(range(4))
+LINE, OVAL, RECTANGLE, ARC, TEXT = list(range(5))
 PENCIL, THIN, THICK = list(range(3))
 
 #Class paint
@@ -155,8 +157,7 @@ class Paint:
             self.main.bind("<Control-S>",self.saveImageLayer)
             self.main.bind("<Control-h>",self.help)
             self.main.bind("<Control-H>",self.help)
-            self.main.bind("<Control-i>",self.insertFigureMenu)
-            self.main.bind("<Control-I>",self.insertFigureMenu)
+            
 
             #Buttons Style
             """
@@ -560,14 +561,6 @@ class Paint:
         a.root.mainloop(0)  
         self._create_icon(a.value)
     
-    #Insert Figures
-    def insertFigureMenu(self,E=False):
-        a = pyv("Insert Figure",DATAICONS+"shaperound.ico","insertfigure",(260,230))
-        print('aqui2', a.value, flush=True)
-        a.root.mainloop(1)
-        print('aqui2', a.value, flush=True)
-        self.createFigure(a.value)
-
     #Retornar la posicion del mouse en dos posiciones y crear alguna figurilla
     def callbackPos(self,event):
         if self.pos[0]==[0,0]:
@@ -601,12 +594,19 @@ class Paint:
             self.pos=[[0,0],[0,0]]
             self.messageUser.config(text="")
 
-    #Insertar un texto
-    def crearTexto(self,event):
-        txt = pyv("Ingresar un texto",DATAICONS+"text.ico","insertartexto",(250,110))
+    #Create Text
+    def createText(self,event):
+        txt = pyv("Write text",DATAICONS+"text.ico","inserttext",(250,110))
         txt.root.mainloop(1)
         self.messageUser.config(text="")
-        self.screen.create_text(event.x,event.y,text=txt.value,font="Arial")
+        print('wie', self.toolWeight, flush=True)
+        _font = tkFont.Font(font="Helvetica", size = 40, weight='bold')
+        _obj = self.screen.create_text(event.x,event.y, text=txt.value,font = _font, fill=self.activeColor,activefill='red', justify=tk.CENTER, tags='token')
+        _objSave = self.screenSave.create_text(event.x,event.y, text=txt.value,font = _font, fill=self.activeColor,activefill='red', justify=tk.CENTER, tags='token')
+        
+        self.stackElements.append(_obj)
+        self.stackElementsSave.append(_objSave)
+
         self.screen.bind("<ButtonPress-1>",self.breakpoint)
         self.draw = True
 
@@ -628,8 +628,9 @@ class Paint:
             self.messageUser.config(text="Drag to create line")
             self.activeFigure = LINE
         if figura=="text":
-            self.screen.bind("<ButtonPress-1>",self.crearTexto)
-            self.messageUser.config(text="Haga click en el dibujo para poner su texto")
+            self.activeFigure = TEXT
+            self.screen.bind("<ButtonPress-1>",self.createText)
+            self.messageUser.config(text="Click where to put text")
         if figura=="arc":
             self.screen.bind("<ButtonPress-1>",self.update_xy)
             self.screen.bind("<B1-Motion>",self.drawFigure)
@@ -731,6 +732,10 @@ class Paint:
             self._obj = self.screen.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
             self._objSave = self.screenSave.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
         
+        elif self.activeFigure == TEXT:
+            self._obj = self.screen.create_text(x, y,text='a',font="Arial", tags='token')
+            self._objSave = self.screen.create_text(x, y,text='a',font="Arial", tags='token')
+
         element = self._obj
         elementS = self._objSave
         self.stackElements.append(element)
@@ -808,7 +813,7 @@ class Paint:
             self.layerName = 'img' + str(self.sizeDatabase)
             image = ImageTk.PhotoImage(image)
             
-            self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
+            self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW, tags='image')
             self.screenSave.delete(ALL)
             self.sizeDatabase = get_image_index()
             
@@ -853,7 +858,7 @@ class Paint:
         self.stackElements = []
         self.stackElementsSave = []
         
-        self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
+        self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW, tags='image')
         
         self.sizeDatabase = get_image_index()
         
