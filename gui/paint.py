@@ -3,13 +3,16 @@ from PIL import ImageTk, Image
 import pickle
 import tkinter.ttk as ttk
 from tkinter import colorchooser
+from os.path import basename
+
 from vision.choose import select_region
 from vision.ar_labeling import arAppCompute
 from vision.utils import get_number_of_files, get_image_index
+import vision.database as vdb
 from gui.pyv import *
 import gui.palette as palette
 from gui.showDatabase import *
-from os.path import basename
+
 
 #Funciones intrinsecas de Paint
 def isNumerable(x):
@@ -713,20 +716,20 @@ class Paint:
         x, y = event.x, event.y
         
         if self.activeFigure == LINE:
-            self._obj = self.screen.create_line((x, y, x, y), fill=self.activeColor,width=self.toolWeight)
-            self._objSave = self.screenSave.create_line((x, y, x, y), fill=self.activeColor,width=self.toolWeight)
+            self._obj = self.screen.create_line((x, y, x, y), fill=self.activeColor,width=self.toolWeight, tags='token')
+            self._objSave = self.screenSave.create_line((x, y, x, y), fill=self.activeColor,width=self.toolWeight, tags='token')
         
         elif self.activeFigure == RECTANGLE:
-            self._obj = self.screen.create_rectangle((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
-            self._objSave = self.screenSave.create_rectangle((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+            self._obj = self.screen.create_rectangle((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
+            self._objSave = self.screenSave.create_rectangle((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
         
         elif self.activeFigure == OVAL:
-            self._obj = self.screen.create_oval((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
-            self._objSave = self.screenSave.create_oval((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+            self._obj = self.screen.create_oval((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
+            self._objSave = self.screenSave.create_oval((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
         
         elif self.activeFigure == ARC:
-            self._obj = self.screen.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
-            self._objSave = self.screenSave.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor)
+            self._obj = self.screen.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
+            self._objSave = self.screenSave.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
         
         element = self._obj
         elementS = self._objSave
@@ -832,6 +835,8 @@ class Paint:
         print('val', database.value[0], database.value[1], flush=True)
         if(database.value[0] == 'edit'):
             self.editLayer(database.value[1])
+        elif(database.value[0] == 'delete'):
+            self.deleteImageDatabase(database.value[1])
 
     def editLayer(self, filepath):
         filename, file_extension = os.path.splitext(filepath)
@@ -845,11 +850,45 @@ class Paint:
         
         self.screen.delete(ALL)
         self.screenSave.delete(ALL)
+        self.stackElements = []
+        self.stackElementsSave = []
         
         self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
         
         self.sizeDatabase = get_image_index()
         
+        #Create empty layer
+        self.screen.update()
+        self.screenSave.update()
+
+        self.main.mainloop(0)
+
+    def deleteImageDatabase(self, filepath):
+        filename, file_extension = os.path.splitext(filepath)
+        index = basename(filename).replace('img', '')
+        filepath = filepath.replace('\\','/')
+        base_file = basename(filepath)
+        print('delete a', filepath, self.imageBackgroundPath, flush=True)
+        name = 'img' + str(index)
+
+        if(filepath == self.imageBackgroundPath):
+            print('delete curr', index, flush=True)
+            self.cleanCanvas()
+
+        vdb.deleteImageFromDatabase(base_file, name)
+  
+
+    def cleanCanvas(self):
+        self.imageBackground = None
+        self.imageBackgroundPath = ""
+        self.layerName = ""
+        self.sizeDatabase = get_image_index()
+
+        self.screen.delete(ALL)
+        self.screenSave.delete(ALL)
+        self.stackElements = []
+        self.stackElementsSave = []
+
         #Create empty layer
         self.screen.update()
         self.screenSave.update()

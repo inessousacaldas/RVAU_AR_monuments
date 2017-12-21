@@ -11,7 +11,8 @@ from vision.utils import pickle_keypoints, unpickle_keypoints
 
 
 
-DATABASE_PATH = '..\database\images\*.jpg'
+DATABASE_PATH_IMAGES = '..\\database\\images\\'
+DATABASE_PATH_IMAGES_LAYERS = '..\\database\\layers\\'
 IMAGES_PATH = '..\database\images_cv'
 
 #SIFT
@@ -64,7 +65,6 @@ def create_file_database(type_alg, image_path, img, kpt, des):
     
     with open(file_img, 'wb') as fp:
         pickle.dump(img, fp)
-
 
 def load_fileImages_database(type_alg):
 
@@ -142,6 +142,8 @@ def load_fileImages_database(type_alg):
         print("LOAD COMPLETO", flush=True)
         return all_images_cv, all_feature_points, all_descriptors
 
+
+
 """
 #image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
 def create_database():
@@ -201,4 +203,27 @@ def load_database():
     
     return images_cv, feature_points, descriptors
 """    
+    
+def deleteImageFromDatabase(image, name):
+
+    try:
+        #Remove image
+        os.remove(DATABASE_PATH_IMAGES + image)
+
+        #Remove layer
+        os.remove(DATABASE_PATH_IMAGES_LAYERS + name + '_layer.png')
+
+        #Remove SIFT
+        os.remove(FILE_PATH_KEYPOINTS_SIFT + name)
+        os.remove(FILE_PATH_DESCRIPTORS_SIFT + name)
+        os.remove(FILE_PATH_IMAGE_SIFT + name)
+        
+        #Remove SURF
+        os.remove(FILE_PATH_KEYPOINTS_SURF + name)
+        os.remove(FILE_PATH_DESCRIPTORS_SURF + name)
+        os.remove(FILE_PATH_IMAGE_SURF + name)
+    
+    except OSError:
+        pass
+    
     
