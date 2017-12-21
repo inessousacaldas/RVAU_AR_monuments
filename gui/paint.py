@@ -1,5 +1,4 @@
 from lib import *
-from pyv import *
 from PIL import ImageTk, Image
 import pickle
 import tkinter.ttk as ttk
@@ -7,6 +6,10 @@ from tkinter import colorchooser
 from vision.choose import select_region
 from vision.ar_labeling import arAppCompute
 from vision.utils import get_number_of_files
+from gui.pyv import *
+import gui.palette as palette
+from gui.showDatabase import *
+
 #Funciones intrinsecas de Paint
 def isNumerable(x):
     if x.strip().isdigit():
@@ -85,8 +88,7 @@ DEFAULT_BACKGROUND = C_DATA[3]
 DEFAULT_TOOL_STYLE = C_DATA[4]
 DEFAULT_TOOL_WEIGHT = C_DATA[5]
 DEFAULT_TOOL = C_DATA[6]
-BACKGROUND_WINDOW = '#37474F'
-BUTTONS_COLOR = '#455A64'
+
 
 LINE, OVAL, RECTANGLE, ARC = list(range(4))
 PENCIL, THIN, THICK = list(range(3))
@@ -123,14 +125,15 @@ class Paint:
             #Database images
             self.sizeDatabase = get_number_of_files()
 
+            self.command = []
             #Window Creation
             self.main = Tk()
-            style = ttk.Style()
+            #style = ttk.Style()
             #style.configure('TButton', background='black')
             #style.configure('TButton', foreground='green')
             #('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
-            style.theme_use("xpnative")
-            print(style.theme_names())
+            #style.theme_use("xpnative")
+            #print(style.theme_names())
             self.main.focus_force()
             self.main.geometry('%dx%d+%d+%d' % (PROGRAM_SIZE[0], PROGRAM_SIZE[1], (self.main.winfo_screenwidth() - PROGRAM_SIZE[0])/2,\
                                                  (self.main.winfo_screenheight() - PROGRAM_SIZE[1])/2))
@@ -138,8 +141,6 @@ class Paint:
             self.main.iconbitmap(DATAICONS+"coloricon.ico")
             self.main.minsize(PROGRAM_SIZE[0], PROGRAM_SIZE[1])
             self.main.resizable(width=False, height=False)
-            
-            
 
             #Window events
             self.main.bind("<Control-Q>",self.exit)
@@ -153,6 +154,27 @@ class Paint:
             self.main.bind("<Control-i>",self.insertFigureMenu)
             self.main.bind("<Control-I>",self.insertFigureMenu)
 
+            #Buttons Style
+            """
+            s = ttk.Style()
+            s.configure("TButton", padding=6, background="blue")
+            s.configure('Wild.TButton',
+                background='black',
+                foreground='white',
+                highlightthickness='20',
+                font=('Helvetica', 10, 'bold'))
+            s.map('Wild.TButton',
+                foreground=[('disabled', 'yellow'),
+                            ('pressed', 'red'),
+                            ('active', 'blue')],
+                background=[('disabled', 'magenta'),
+                            ('pressed', '!focus', 'cyan'),
+                            ('active', 'green')],
+                highlightcolor=[('focus', 'green'),
+                                ('!focus', 'red')],
+                relief=[('pressed', 'groove'),
+                        ('!pressed', 'ridge')])
+            """
             #Menu
             menuBar = Menu(self.main)
             self.main.config(menu=menuBar)
@@ -205,38 +227,39 @@ class Paint:
             """
 
             #Draw Frame
-            ParentFrame = Frame(self.main, background=BACKGROUND_WINDOW)
+            ParentFrame = Frame(self.main, background=palette.BACKGROUND_WINDOW)
             ParentFrame.grid()
             
             #Draw Canvas
-            windowFrame = Frame(ParentFrame, background=BACKGROUND_WINDOW)
+            windowFrame = Frame(ParentFrame, background=palette.BACKGROUND_WINDOW)
             windowFrame.grid_rowconfigure(0, weight=1)
             windowFrame.grid_columnconfigure(0, weight=1)
             windowFrame.grid(row=0, column=0, sticky="nsew")
-            windowFrame2 = Frame(ParentFrame, background=BACKGROUND_WINDOW)
+            windowFrame2 = Frame(ParentFrame, background=palette.BACKGROUND_WINDOW)
             windowFrame2.grid_rowconfigure(0, weight=1)
             windowFrame2.grid_columnconfigure(0, weight=1)
             windowFrame2.grid(row=0, column=0, sticky="nsew")
 
             windowFrame2.lower()
             
-            self.screen = Canvas(windowFrame,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND)
+            self.screen = Canvas(windowFrame,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=palette.CANVAS_COLOR)
             self.screenSave = Canvas(windowFrame2,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND, relief="sunken")
             self.screen.grid()
             self.screenSave.grid()
 
             #Buttons
-            Buttonframe = Frame(ParentFrame,border=5, background=BACKGROUND_WINDOW)
+            Buttonframe = Frame(ParentFrame,border=5, background=palette.BACKGROUND_WINDOW)
             Buttonframe.grid(row=0, column=1, sticky="NW")
             Label(Buttonframe,text="Tools",border=10).pack()
             
-            ttk.Button(Buttonframe,text="Insert Icons",width=20,command=self.insertIcons, style="TButton").pack()
+            ttk.Button(Buttonframe,text="Insert Icons",width=20,command=self.insertIcons, style="Wild.TButton").pack()
 
             b_undo = ttk.Button(Buttonframe,text="Undo",width=20,command=self.undoElement, style="TButton")
             image_undo = Image.open(DATAICONS + "eraser.png")
             image_undo = image_undo.resize((32,32), Image.ANTIALIAS)
             image_undo = ImageTk.PhotoImage(image_undo)
             b_undo.config(image=image_undo)
+            
             b_undo.pack()
 
             b_pencil = ttk.Button(Buttonframe,text="Pencil",width=20,command=lambda:self.tools("pencil"), style="TButton")
@@ -250,10 +273,8 @@ class Paint:
               
             ttk.Button(Buttonframe,text="Thick Brush",width=20,command=lambda:self.tools("brushthick"), style="TButton").pack()
             
-            ttk.Button(Buttonframe,text="Insert Object",width=20,command=self.insertFigureMenu, style="TButton").pack()
-
             #Insert Figures
-            FiguresInsert = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            FiguresInsert = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             FiguresInsert.pack()
 
             b_line = ttk.Button(FiguresInsert,text="Insert Line",width=20,command=lambda:self.createFigure('line'), style="TButton")
@@ -286,14 +307,14 @@ class Paint:
             
             #Tools info
             Label(Buttonframe,text="tools",border=10).pack()
-            WeightPencil = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            WeightPencil = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             WeightPencil.pack()
             self.infoWeightPencil = Label(WeightPencil,text=str(self.toolWeight),border=3,font=10,width=2)
             self.infoWeightPencil.pack(side=LEFT)
             Label(WeightPencil,text="  ").pack(side=LEFT)
             ttk.Button(WeightPencil,text="Weight",command=self.toolWeightChange,width=9).pack()
             
-            PencilStyle = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            PencilStyle = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             PencilStyle.pack()
             Label(PencilStyle,text=" ",border=3,font=10,width=2).pack(side=LEFT)
             Label(PencilStyle,text="  ").pack(side=LEFT)
@@ -301,7 +322,7 @@ class Paint:
 
             #Color Information
             Label(Buttonframe,text="Colors",border=10).pack()
-            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            activeColor = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             activeColor.pack()
             self.infoactivedcolor = Canvas(activeColor,width=30,height=32,bg=self.activeColor)
             self.infoactivedcolor.pack(side=LEFT)
@@ -313,7 +334,7 @@ class Paint:
             b_color.config(image=image_color)
             b_color.pack()
 
-            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            activeColor = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             activeColor.pack()
             self.infoactivedbackgroundcolor = Canvas(activeColor,width=30,height=32,bg=self.backgroundColor)
             self.infoactivedbackgroundcolor.pack(side=LEFT)
@@ -325,7 +346,7 @@ class Paint:
             b_colorBucket.config(image=image_color_bucket)
             b_colorBucket.pack()
             
-            activeColor = Frame(Buttonframe, background=BACKGROUND_WINDOW)
+            activeColor = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             activeColor.pack()
             
             #Info for user
@@ -335,10 +356,11 @@ class Paint:
 
             #Vision
             Label(Buttonframe,text="Vision",border=10).pack()
+            ttk.Button(Buttonframe,text="Add image",width=20,command=self.addImageDatabase, style="TButton").pack()
             ttk.Button(Buttonframe,text="Key Points",width=20,command=self.computeKeyPoints).pack()
             ttk.Button(Buttonframe,text="SIFT",width=20,command=lambda:self.arApp('sift')).pack()
             ttk.Button(Buttonframe,text="SURF",width=20,command=lambda:self.arApp('surf')).pack()
-
+            ttk.Button(Buttonframe,text="Database",width=20,command=self.seeDatabase).pack()
 
             # add bindings for clicking, dragging and releasing over
             # any object with the "icon" tag
@@ -346,9 +368,9 @@ class Paint:
             # this data is used to keep track of an 
             # item being dragged
             self._drag_data = {"x": 0, "y": 0, "item": None, "itemSave": None}
-            self.screen.tag_bind("icon", "<ButtonPress-3>", self.on_icon_press)
-            self.screen.tag_bind("icon", "<ButtonRelease-3>", self.on_icon_release)
-            self.screen.tag_bind("icon", "<B3-Motion>", self.on_icon_motion)
+            self.screen.tag_bind("token", "<ButtonPress-3>", self.on_token_press)
+            self.screen.tag_bind("token", "<ButtonRelease-3>", self.on_token_release)
+            self.screen.tag_bind("token", "<B3-Motion>", self.on_token_motion)
 
 
             #Init functions indev
@@ -544,9 +566,9 @@ class Paint:
     #Insert Figures
     def insertFigureMenu(self,E=False):
         a = pyv("Insert Figure",DATAICONS+"shaperound.ico","insertfigure",(260,230))
-        print('aqui', a.value, flush=True)
+        print('aqui2', a.value, flush=True)
         a.root.mainloop(1)
-        print('aqui', a.value, flush=True)
+        print('aqui2', a.value, flush=True)
         self.createFigure(a.value)
 
     #Retornar la posicion del mouse en dos posiciones y crear alguna figurilla
@@ -582,20 +604,6 @@ class Paint:
             self.pos=[[0,0],[0,0]]
             self.messageUser.config(text="")
 
-    #Crear un poligono
-    def crearPoligono(self,event):
-        if self.vertices>0:
-            self.messageUser.config(text="Haga click en la screen para definir los vertices de su figura, "+str(self.vertices-1)+" restantes")
-            self.vertices-=1
-            self.pointable.append([event.x,event.y])
-        if self.vertices==0:
-            self.screen.create_polygon(self.pointable,fill=self.backgroundColor,outline=self.activeColor)
-            self.pointable=[]
-            self.tools(self.activeTool)
-            self.screen.bind("<ButtonPress-1>",self.breakpoint)
-            self.messageUser.config(text="")
-            self.draw = True
-
     #Insertar un texto
     def crearTexto(self,event):
         txt = pyv("Ingresar un texto",DATAICONS+"text.ico","insertartexto",(250,110))
@@ -630,29 +638,7 @@ class Paint:
             self.screen.bind("<B1-Motion>",self.drawFigure)
             self.activeFigure = ARC
             self.messageUser.config(text="Drag to create arc")   
-        
-        if figura=="image":
-            self.messageUser.config(text="Enter the location of your image.")
-            filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-            self.messageUser.config(text="")
-            if filepath!="": #TODO see if image file
-                self.mainArchive=filepath
-                
-                print('database ', self.sizeDatabase)
-                filename, file_extension = os.path.splitext(filepath)
-                print(file_extension, flush=True)
-
-                image = Image.open(filepath)                
-                image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
-                name = DATABASE_PATH + 'img' + str(self.sizeDatabase) + file_extension
-                image.save(name)
-                self.imageBackgroundPath = name
-                self.layerName = 'img' + str(self.sizeDatabase)
-                image = ImageTk.PhotoImage(image)
-               
-                self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
-                
-                self.main.mainloop(0)
+            
 
         if figura =="polygn":
             a = pyv("Numero de aristas",DATAICONS+"shaperound.ico","vertices",(260,115))
@@ -756,8 +742,7 @@ class Paint:
         self.lastx, self.lasty = x, y
 
 
-    #Icons Drag
-
+    #Token Drag
     def _create_icon(self, filepath):
         if(filepath != None):
             print('aqui',filepath, flush=True)
@@ -766,16 +751,14 @@ class Paint:
             images = Image.open(filepath)
             images = images.resize((64,64), Image.ANTIALIAS)
             images = ImageTk.PhotoImage(images)
-            im = self.screen.create_image(PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="icon", state=NORMAL)
-            imSave = self.screenSave.create_image(PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="icon", state=NORMAL)
+            im = self.screen.create_image(PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="token", state=NORMAL)
+            imSave = self.screenSave.create_image(PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="token", state=NORMAL)
             self.stackElements.append(im)
             self.stackElementsSave.append(imSave)
-            #TODO
-            self.screen.repack()
-            #PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]
+            mainloop()
+            self.draw = True
             
-
-    def on_icon_press(self, event):
+    def on_token_press(self, event):
         '''Begining drag of an object'''
         # record the item and its location
         self._drag_data["item"] = self.screen.find_closest(event.x, event.y)[0]
@@ -783,7 +766,7 @@ class Paint:
         self._drag_data["x"] = event.x
         self._drag_data["y"] = event.y
 
-    def on_icon_release(self, event):
+    def on_token_release(self, event):
         '''End drag of an object'''
         # reset the drag information
         self._drag_data["item"] = None
@@ -791,7 +774,7 @@ class Paint:
         self._drag_data["x"] = 0
         self._drag_data["y"] = 0
 
-    def on_icon_motion(self, event):
+    def on_token_motion(self, event):
         if(self._drag_data["item"] != None):
             '''Handle dragging of an object'''
             # compute how much the mouse has moved
@@ -804,8 +787,40 @@ class Paint:
             self._drag_data["x"] = event.x
             self._drag_data["y"] = event.y
 
+
     ###########################
     #Vision
+
+    def addImageDatabase(self):
+        self.messageUser.config(text="Enter the location of your image.")
+        filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+        self.messageUser.config(text="")
+        if filepath!="": #TODO see if image file
+            self.mainArchive=filepath
+            
+            print('database ', self.sizeDatabase)
+            filename, file_extension = os.path.splitext(filepath)
+            print(file_extension, flush=True)
+
+            image = Image.open(filepath)                
+            image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
+            name = DATABASE_PATH + 'img' + str(self.sizeDatabase) + file_extension
+            image.save(name)
+            self.imageBackgroundPath = name
+            self.layerName = 'img' + str(self.sizeDatabase)
+            image = ImageTk.PhotoImage(image)
+            
+            self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
+            self.screenSave.delete(ALL)
+            self.sizeDatabase = get_number_of_files()
+            self.main.mainloop()
+
+    
+    def seeDatabase(self):
+        print('see database', flush=True)
+        a = showDatabase(self.main, DATABASE_PATH, DATABASE_LAYERS)
+        a.root.mainloop(0)  
+        print('val', a.value[0], flush=True)
 
     def computeKeyPoints(self):
         print("Aqui", flush=True)

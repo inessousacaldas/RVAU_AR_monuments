@@ -25,7 +25,7 @@ class pyvi:
     def __init__(self,master, title,icon,type_win,size, properties=[0,0,0,0,0]):
         self.master = master
         self.root = tkinter.Toplevel(master)
-        #tkinter.Toplevel(self.root)
+
         self.value = 0
         
         self.root.geometry('%dx%d+%d+%d' % (size[0], size[1], (self.root.winfo_screenwidth() - size[0])/2,\
@@ -373,13 +373,13 @@ class pyv:
         #Menu insert figure
         if type_win=="insertfigure":
             Label(self.root,text="Insert figure",font=DEFAULT_FONT_TITLE,border=10).pack()
-            Button(self.root, text="Arc",command=lambda:self.enviarFigura("arc"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Square",command=lambda:self.enviarFigura("square"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Image",command=lambda:self.enviarFigura("image"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Oval",command=lambda:self.enviarFigura("oval"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Polygn",command=lambda:self.enviarFigura("polygon"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Line",command=lambda:self.enviarFigura("line"),width=10,relief=GROOVE).pack() 
-            Button(self.root, text="Text",command=lambda:self.enviarFigura("text"),width=10,relief=GROOVE).pack()
+            Button(self.root, text="Arc",command=lambda:self.sendFigure("arc"),width=10,relief=GROOVE).pack()
+            Button(self.root, text="Square",command=lambda:self.sendFigure("square"),width=10,relief=GROOVE).pack()
+            Button(self.root, text="Image",command=lambda:self.sendFigure("image"),width=10,relief=GROOVE).pack()
+            Button(self.root, text="Oval",command=lambda:self.sendFigure("oval"),width=10,relief=GROOVE).pack()
+            Button(self.root, text="Polygn",command=lambda:self.sendFigure("polygon"),width=10,relief=GROOVE).pack()
+            Button(self.root, text="Line",command=lambda:self.sendFigure("line"),width=10,relief=GROOVE).pack() 
+            Button(self.root, text="Text",command=lambda:self.sendFigure("text"),width=10,relief=GROOVE).pack()
             print('a', flush=True)
             
         #Menu insert figura
@@ -505,7 +505,7 @@ class pyv:
             self.root.destroy()
         
     #Enviar una figura
-    def enviarFigura(self,figura):
+    def sendFigure(self,figura):
         self.value = figura
         self.root.destroy()
         
