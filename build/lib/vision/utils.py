@@ -8,6 +8,17 @@ import numpy as np
 DATABASE_PATH = '..\database\images\*'
 LAYER_AR_PATH = '..\database\layers\\'
 
+def get_image_index():
+    index = 1
+    files = glob.glob(DATABASE_PATH)
+  
+    if(len(files) !=0):
+        filename = os.path.splitext(files[-1])[0]
+        index = basename(filename).replace('img', '')
+        index = int(index) + 1
+    
+    return index
+
 def get_number_of_files():
 
     files = glob.glob(DATABASE_PATH)

@@ -5,7 +5,7 @@ import tkinter.ttk as ttk
 from tkinter import colorchooser
 from vision.choose import select_region
 from vision.ar_labeling import arAppCompute
-from vision.utils import get_number_of_files
+from vision.utils import get_number_of_files, get_image_index
 from gui.pyv import *
 import gui.palette as palette
 from gui.showDatabase import *
@@ -123,7 +123,7 @@ class Paint:
             self.stackElements = []
             self.stackElementsSave = []
             #Database images
-            self.sizeDatabase = get_number_of_files()
+            self.sizeDatabase = get_image_index()
 
             self.command = []
             #Window Creation
@@ -147,8 +147,8 @@ class Paint:
             self.main.bind("<Control-q>",self.exit)
             self.main.bind("<Control-N>",self.newImage)
             self.main.bind("<Control-n>",self.newImage)
-            self.main.bind("<Control-s>",self.saveImage)
-            self.main.bind("<Control-S>",self.saveImage)
+            self.main.bind("<Control-s>",self.saveImageLayer)
+            self.main.bind("<Control-S>",self.saveImageLayer)
             self.main.bind("<Control-h>",self.help)
             self.main.bind("<Control-H>",self.help)
             self.main.bind("<Control-i>",self.insertFigureMenu)
@@ -182,7 +182,7 @@ class Paint:
             #File
             fileMenu = Menu(menuBar,tearoff=0)
             fileMenu.add_command(label="New    [Ctrl-N]",command=self.newImage)
-            fileMenu.add_command(label="Save    [Ctrl-S]",command=self.saveImage)
+            fileMenu.add_command(label="Save    [Ctrl-S]",command=self.saveImageLayer)
             fileMenu.add_separator()
             fileMenu.add_command(label="Exit    [Ctrl-Q]",command=self.exit)
             menuBar.add_cascade(label="File",menu=fileMenu)
@@ -354,7 +354,7 @@ class Paint:
             self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=5,justify=CENTER,wraplength=125)
             self.messageUser.pack()
 
-            #Vision
+            #Vision Buttons
             Label(Buttonframe,text="Vision",border=10).pack()
             ttk.Button(Buttonframe,text="Add image",width=20,command=self.addImageDatabase, style="TButton").pack()
             ttk.Button(Buttonframe,text="Key Points",width=20,command=self.computeKeyPoints).pack()
@@ -460,13 +460,13 @@ class Paint:
             resp = pyv("Save",DATAICONS+"alert.ico","save",(250,80))
             resp.root.mainloop(1)
             if resp.value!=0:
-                if resp.value: self.saveImage()
+                if resp.value: self.saveImageLayer()
         self.messageUser.config(text="")
         self.screen.create_rectangle(0,0,2*PROGRAM_SIZE[0], 2*PROGRAM_SIZE[1],fill=DEFAULT_BACKGROUND)
         self.draw = False
 
     #Save imagen
-    def saveImage(self,i="null"):#TODO
+    def saveImageLayer(self,i="null"):#TODO
         if self.draw:
             self.screen.update()
             self.screenSave.update()
@@ -485,13 +485,6 @@ class Paint:
                 img.save(DATASAVES+str(txt.value) + '.png', 'png')
                 self.draw = False
 
-            else:
-                filename = DATASAVES+DEFAULT_TITLE+DEFAULT_EXTENSION
-                self.screenSave.postscript(file=filename)
-                img = Image.open(filename)
-                img.save(DATASAVES+str(txt.value) + '.png', 'png')
-                self.draw = False
-                self.saveLayer(img)
     
     #Save layer AR
     def saveLayer(self, img):
@@ -514,7 +507,7 @@ class Paint:
             resp = pyv("Save",DATAICONS+"alert.ico","saveIt",(250,80))
             resp.root.mainloop(1)
             if resp.value!=0:
-                if resp.value: self.saveImage()
+                if resp.value: self.saveImageLayer()
         self.main.destroy()
 
     #Save Color Tools    - active, eraser
@@ -776,16 +769,18 @@ class Paint:
 
     def on_token_motion(self, event):
         if(self._drag_data["item"] != None):
+            print('draggin item', self._drag_data["item"])
             '''Handle dragging of an object'''
             # compute how much the mouse has moved
             delta_x = event.x - self._drag_data["x"]
             delta_y = event.y - self._drag_data["y"]
             # move the object the appropriate amount
             self.screen.move(self._drag_data["item"], delta_x, delta_y)
-            self.screenSave.move(self._drag_data["item"], delta_x, delta_y)
+            self.screenSave.move(self._drag_data["itemSave"], delta_x, delta_y)
             # record the new position
             self._drag_data["x"] = event.x
             self._drag_data["y"] = event.y
+            self.draw = True
 
 
     ###########################
@@ -795,12 +790,12 @@ class Paint:
         self.messageUser.config(text="Enter the location of your image.")
         filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
         self.messageUser.config(text="")
+        
         if filepath!="": #TODO see if image file
             self.mainArchive=filepath
             
             print('database ', self.sizeDatabase)
             filename, file_extension = os.path.splitext(filepath)
-            print(file_extension, flush=True)
 
             image = Image.open(filepath)                
             image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
@@ -812,7 +807,22 @@ class Paint:
             
             self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
             self.screenSave.delete(ALL)
-            self.sizeDatabase = get_number_of_files()
+            self.sizeDatabase = get_image_index()
+            
+            #Create empty layer
+            self.screen.update()
+            self.screenSave.update()
+            
+            filename = DATASAVES+'temp'+DEFAULT_EXTENSION
+            print('as', self.screenSave.size, flush=True)
+            self.screenSave.postscript(file=filename, colormode='color',  height = 770, pagewidth=819)
+
+            img = Image.open(filename)
+            print(img.size, flush=True)
+            self.saveLayer(img)
+            img.save(DATASAVES+str(txt.value) + '.png', 'png')
+
+
             self.main.mainloop()
 
     
