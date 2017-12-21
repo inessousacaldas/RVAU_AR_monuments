@@ -1,5 +1,5 @@
-@ECHO OFF
-ECHO MonumentAR Application
+@echo OFF
+echo MonumentAR Application
 
 cd ..
 python setup.py install
@@ -11,13 +11,13 @@ timeout 1
 
 python paint.py
 
-ECHO.
-ECHO See you later
-ECHO.
-ECHO Authors:
-ECHO.
-ECHO Ines Caldas 
-ECHO.
-ECHO Joel Carneiro
-ECHO.
+echo.
+echo See you later
+echo.
+echo Authors:
+echo.
+echo Ines Caldas 
+echo.
+echo Joel Carneiro
+echo.
 
