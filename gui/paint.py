@@ -9,6 +9,7 @@ from vision.utils import get_number_of_files, get_image_index
 from gui.pyv import *
 import gui.palette as palette
 from gui.showDatabase import *
+from os.path import basename
 
 #Funciones intrinsecas de Paint
 def isNumerable(x):
@@ -794,7 +795,6 @@ class Paint:
         if filepath!="": #TODO see if image file
             self.mainArchive=filepath
             
-            print('database ', self.sizeDatabase)
             filename, file_extension = os.path.splitext(filepath)
 
             image = Image.open(filepath)                
@@ -820,17 +820,42 @@ class Paint:
             img = Image.open(filename)
             print(img.size, flush=True)
             self.saveLayer(img)
-            img.save(DATASAVES+str(txt.value) + '.png', 'png')
+            img.save(DATASAVES+'temp' + '.png', 'png')
 
 
             self.main.mainloop()
 
-    
     def seeDatabase(self):
         print('see database', flush=True)
-        a = showDatabase(self.main, DATABASE_PATH, DATABASE_LAYERS)
-        a.root.mainloop(0)  
-        print('val', a.value[0], flush=True)
+        database = showDatabase(self.main, DATABASE_PATH, DATABASE_LAYERS)
+        database.root.mainloop(0)  
+        print('val', database.value[0], database.value[1], flush=True)
+        if(database.value[0] == 'edit'):
+            self.editLayer(database.value[1])
+
+    def editLayer(self, filepath):
+        filename, file_extension = os.path.splitext(filepath)
+        index = basename(filename).replace('img', '')
+       
+        image = Image.open(filepath)                
+        image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
+        self.imageBackgroundPath = filepath
+        self.layerName = 'img' + str(index)
+        image = ImageTk.PhotoImage(image)
+        
+        self.screen.delete(ALL)
+        self.screenSave.delete(ALL)
+        
+        self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW)
+        
+        self.sizeDatabase = get_image_index()
+        
+        #Create empty layer
+        self.screen.update()
+        self.screenSave.update()
+
+        self.main.mainloop(0)
+
 
     def computeKeyPoints(self):
         print("Aqui", flush=True)
