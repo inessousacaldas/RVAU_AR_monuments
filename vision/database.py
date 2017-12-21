@@ -32,8 +32,6 @@ FILE_PATH_LOAD_DESCRIPTORS_SURF = "..\\database\\vision\\surf\\descriptors\\*"
 FILE_PATH_IMAGE_LOAD_SURF = "..\\database\\vision\\surf\\images\\*"
 
 
-
-#image_list = [Image.open(item) for i in [glob.glob('%s*.%s' % (DATABASE_PATH, ext)) for ext in ["jpg","gif","png","tga"]] for item in i]
 def create_file_database(type_alg, image_path, img, kpt, des):
 
      #get image name, without complete path

@@ -7,7 +7,7 @@ import tkinter.font as tkFont
 
 from os.path import basename
 
-from vision.choose import select_region
+from vision.choose import select_region, keypoints_default
 from vision.ar_labeling import arAppCompute
 from vision.utils import get_number_of_files, get_image_index
 import vision.database as vdb
@@ -830,6 +830,9 @@ class Paint:
             self.saveLayer(img)
             img.save(DATASAVES+'temp' + '.png', 'png')
 
+            #Calculates default keypoints and descriptors
+            keypoints_default(self.imageBackgroundPath)
+
 
             self.main.mainloop()
 
@@ -837,11 +840,12 @@ class Paint:
         print('see database', flush=True)
         database = showDatabase(self.main, DATABASE_PATH, DATABASE_LAYERS)
         database.root.mainloop(0)  
-        print('val', database.value[0], database.value[1], flush=True)
-        if(database.value[0] == 'edit'):
-            self.editLayer(database.value[1])
-        elif(database.value[0] == 'delete'):
-            self.deleteImageDatabase(database.value[1])
+        if(database.value != None):
+            print('val', database.value[0], database.value[1], flush=True)
+            if(database.value[0] == 'edit'):
+                self.editLayer(database.value[1])
+            elif(database.value[0] == 'delete'):
+                self.deleteImageDatabase(database.value[1])
 
     def editLayer(self, filepath):
         filename, file_extension = os.path.splitext(filepath)
