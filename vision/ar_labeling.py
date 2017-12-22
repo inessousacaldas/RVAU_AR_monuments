@@ -1,19 +1,19 @@
 from __future__ import print_function
 from PIL import Image
 from vision.database import load_fileImages_database
-from vision.feature_points import *
+from vision.feature_points import calculate_feature_points, calculate_matches, compute_matches, compute_homography
 from vision.utils import get_image_layerAR
-from vision.feature_points import *
+
 
 IMAGE_TEST_PATH = '..\database\sample\image.jpg'
 
 # Tests the user image with databe and computes the homography, then it shows the results
 # Need algorithm type and ransac value
-def image_test(image_test, database_images, algorithm_type, ransac_value):
+def image_test(image_test, database_images, algorithm_type, ransac_value, debug_bool):
     
     #Calculates feature points for test image
-    img, kp, des = calculate_feature_points(image_test, algorithm_type)
-
+    img, kp, des = calculate_feature_points(image_test, algorithm_type, debug_bool)
+ 
     image = [img, kp, des]
     
     #Calculates matches of image test with all images from database
@@ -43,12 +43,11 @@ def image_test(image_test, database_images, algorithm_type, ransac_value):
 # compute the test image and show the findings 
 # args : the image path, the algorithm name ('sift' or 'surf') and the ransac value (float)
 # arAppCompute('..\database\images\c\img1_01.jpg', 'surf', 0.6) 
-def arAppCompute(image_test_path, algorithm_type, ransac_value):
-
+def arAppCompute(image_test_path, algorithm_type, ransac_value, debug_bool):
     images_cv, feature_points, descriptors = load_fileImages_database(algorithm_type)
     database_images = [images_cv, feature_points, descriptors]
     
-    image_test(image_test_path, database_images, algorithm_type, ransac_value)
+    image_test(image_test_path, database_images, algorithm_type, ransac_value, debug_bool)
 
 """
 def main():
@@ -62,3 +61,4 @@ def main():
 if __name__== "__main__":
     main()
 """
+arAppCompute('..\database\images\img1.jpg', 'surf', 0.6, False) 

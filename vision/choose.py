@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from vision.database import create_file_database
+from vision.feature_points import debug_variable
 
 # Computes the mask select by the user
 def applyMask(img, r):
@@ -17,16 +18,17 @@ def applyMask(img, r):
     mask_color = cv2.cvtColor(mask_color,cv2.COLOR_BGR2GRAY)
     res = cv2.bitwise_and(img,img,mask = mask_color)
 
-    # Display constructed mask
-    cv2.namedWindow("Mask", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Mask", 600, 400)
-    cv2.imshow("Mask", mask)
+    if debug_variable:
+        # Display constructed mask
+        cv2.namedWindow("Mask", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Mask", 600, 400)
+        cv2.imshow("Mask", mask)
 
-    cv2.namedWindow("Res", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Res", 600, 400)
-    cv2.imshow("Res", res)
+        cv2.namedWindow("Res", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Res", 600, 400)
+        cv2.imshow("Res", res)
 
-    cv2.waitKey(0)
+        cv2.waitKey(0)
 
     return res
 
@@ -54,15 +56,22 @@ def select_region(image_path):
     sift = cv2.xfeatures2d.SIFT_create()
     # find the keypoints and descriptors with SIFT
     kp1, des1 = sift.detectAndCompute(gray,None)
-    print('kp %s desc %s ' % (len(kp1),len(des1)) ,flush=True)
+    if debug_variable:
+        print('kp %s desc %s ' % (len(kp1),len(des1)) ,flush=True)
+   
     create_file_database('sift', image_path, im, kp1,des1)
-    
+   
+    if debug_variable:
+        print('Hessian Threshold = 400',flush=True)
+   
     print('surf algorithm',flush=True)
-    print('Hessian Threshold = 400',flush=True)
     surf = cv2.xfeatures2d.SURF_create(400)
     # Find keypoints and descriptors directly
     kp, des = surf.detectAndCompute(gray,None)
-    print('kp %s desc %s ' % (len(kp),len(des)) ,flush=True)
+    
+    if debug_variable:
+        print('kp %s desc %s ' % (len(kp),len(des)) ,flush=True)
+   
     create_file_database('surf', image_path, im, kp,des)
 
 
@@ -72,8 +81,8 @@ def keypoints_default(image_path):
     # Read image
     im = cv2.imread(image_path)
 
-
-    print('Calculating feature points for image %s' % image_path, flush=True)
+    if debug_variable:
+        print('Calculating feature points for image %s' % image_path, flush=True)
 
     gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
     
@@ -82,15 +91,24 @@ def keypoints_default(image_path):
     sift = cv2.xfeatures2d.SIFT_create()
     # find the keypoints and descriptors with SIFT
     kp1, des1 = sift.detectAndCompute(gray,None)
-    print('kp %s desc %s ' % (len(kp1),len(des1)) ,flush=True)
+    
+    if debug_variable:
+        print('kp %s desc %s ' % (len(kp1),len(des1)) ,flush=True)
+    
     create_file_database('sift', image_path, im, kp1,des1)
     
     print('surf algorithm',flush=True)
-    print('Hessian Threshold = 400',flush=True)
+
+    if debug_variable:
+        print('Hessian Threshold = 400',flush=True)
+   
     surf = cv2.xfeatures2d.SURF_create(400)
     # Find keypoints and descriptors directly
     kp, des = surf.detectAndCompute(gray,None)
-    print('kp %s desc %s ' % (len(kp),len(des)) ,flush=True)
+    
+    if debug_variable:
+        print('kp %s desc %s ' % (len(kp),len(des)) ,flush=True)
+    
     create_file_database('surf', image_path, im, kp,des)
 
 
