@@ -497,19 +497,19 @@ class Paint:
         if self.draw:
             self.screen.update()
             self.screenSave.update()
-            txt = pyv("Save",DATAICONS+"save.ico","savefile",(250,110))
+            txt = pyv("Save",DATAICONS+"save.ico","save",(250,110))
             txt.root.mainloop(1)
             print(txt.value, flush=True)
             
-            if txt.value!=0:
-                filename = DATASAVES+str(txt.value)+DEFAULT_EXTENSION
+            if txt.value:
+                filename = DATASAVES+'tmp'+DEFAULT_EXTENSION
                 print('as', self.screenSave.size, flush=True)
                 self.screenSave.postscript(file=filename, colormode='color',  height = 770, pagewidth=819)
 
                 img = Image.open(filename)
                 print('size ', img.size, flush=True)
                 self.saveLayer(img)
-                img.save(DATASAVES+str(txt.value) + '.png', 'png')
+                img.save(DATASAVES+'tmp.png', 'png')
                 self.draw = False
 
     #Save layer AR
@@ -729,7 +729,6 @@ class Paint:
     #Vision
 
     def addImageDatabase(self):
-        print('debug', self.debug, flush=True)
         self.messageUser.config(text="Enter the location of your image.")
         filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
         self.messageUser.config(text="")
@@ -741,10 +740,17 @@ class Paint:
 
             image = Image.open(filepath)                
             image = image.resize((int(PROGRAM_SIZE[0]*0.7815), PROGRAM_SIZE[1]), Image.ANTIALIAS)
-            name = DATABASE_PATH + 'img' + str(self.sizeDatabase) + file_extension
+
+            namefile = ""
+            if(self.sizeDatabase<10):
+                namefile = 'img0' + str(self.sizeDatabase)
+            else:
+                namefile = 'img' + str(self.sizeDatabase)
+
+            name = DATABASE_PATH + namefile + file_extension
             image.save(name)
             self.imageBackgroundPath = name
-            self.layerName = 'img' + str(self.sizeDatabase)
+            self.layerName = namefile
             image = ImageTk.PhotoImage(image)
             
             self.imageBackground = self.screen.create_image(0, 0, image = image, anchor = NW, tags='image')
@@ -767,17 +773,22 @@ class Paint:
             #Calculates default keypoints and descriptors
             keypoints_default(self.imageBackgroundPath, self.debug.get())
 
-
             self.main.mainloop()
 
     def seeDatabase(self):
-        database = showDatabase(self.main, DATABASE_PATH, DATABASE_LAYERS)
-        database.root.mainloop(0)  
-        if(database.value != None):
-            if(database.value[0] == 'edit'):
-                self.editLayer(database.value[1])
-            elif(database.value[0] == 'delete'):
-                self.deleteImageDatabase(database.value[1])
+        num_files = get_number_of_files()
+        
+        if(num_files == 0):
+            self.messageUser.config(text="Database empty.")
+        
+        else:
+            database = showDatabase(self.main, DATABASE_PATH, DATABASE_LAYERS)
+            database.root.mainloop(0)  
+            if(database.value != None):
+                if(database.value[0] == 'edit'):
+                    self.editLayer(database.value[1])
+                elif(database.value[0] == 'delete'):
+                    self.deleteImageDatabase(database.value[1])
 
     def editLayer(self, filepath):
         filename, file_extension = os.path.splitext(filepath)
@@ -839,18 +850,24 @@ class Paint:
         print("Aqui", flush=True)
         print("imageBackgroundPath", self.imageBackgroundPath)
         if(self.imageBackgroundPath==""):
-            #TODO add popup
+            self.messageUser.config(text="Select image first.")
             print("Select image first.")
         else:
             select_region(self.imageBackgroundPath, self.debug.get())
 
     def arApp(self, algorithm):
-        filepath = askopenfilename(title="Open",initialdir=TEST_PATH,defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-        self.messageUser.config(text="")
-        #if filepath!="" and (filepath[len(filepath)-4:len(filepath)]==".jpg" or filepath[len(filepath)-4:len(filepath)]==".gif"):
-        if filepath!="":
-            print(filepath, flush=True)
-            arAppCompute(filepath, algorithm, self.ransac_value.get(), self.debug.get())
+        num_files = get_number_of_files()
+        
+        if(num_files == 0):
+            self.messageUser.config(text="Database empty.")
+        
+        else:
+            filepath = askopenfilename(title="Open",initialdir=TEST_PATH,defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+            self.messageUser.config(text="")
+            #if filepath!="" and (filepath[len(filepath)-4:len(filepath)]==".jpg" or filepath[len(filepath)-4:len(filepath)]==".gif"):
+            if filepath!="":
+                print(filepath, flush=True)
+                arAppCompute(filepath, algorithm, self.ransac_value.get(), self.debug.get())
 
     def changeDebugMode(self):
         if(self.debug.get()):
