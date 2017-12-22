@@ -2,7 +2,7 @@
 
 ----------------------
 
-# Autores
+# Authors
 
 Inês Caldas
 
@@ -11,9 +11,9 @@ Joel Carneiro
 
 ----------------------
 
-# Instalação
+# Install
 
-Antes de executar a aplicação é necessário instalar as dependências da mesma. As versões em que a aplicação foi desenvolvida encontram-se em baixo.
+Before running the application it's necessary to install the dependencies. The versions in which the application was developed are below.
 
 ```
 python --> 3.6.3
@@ -27,37 +27,41 @@ ghostscript --> Ghostscript 9.22 for Windows --> (https://www.ghostscript.com/do
 ```
 
 
-Depois de criado o ambiente do python com as restantes dependências da aplicação o utilizador deverá aceder ao ficheiro scriptWin.bat ou scriptUnix.sh, dependendo do seu sistema operativo, que está na pasta Ar_monuments/gui.
+After the python environment has been created with the remaining dependencies of the application, the user must access the scriptWin.bat or scriptUnix.sh file, depending on his operating system, which is in the Ar_monuments / gui folder.
 
 
 ----------------------
 
-# Introdução
+# Introduction
 
-No âmbito da unidade curricular de Realidade Virtual e Aumentada do Mestrado Integrado em Engenharia Informática e Computação da Faculdade de Engenharia do Porto foi desenvolvida uma aplicação com o objetivo de “aumentar” imagens de fachadas de edifícios, reconhecendo desta forma marcas naturais.
+Augmented Reality can be defined as an augmented view of the physical world through virtually generated elements. MonumentAR is an augmented reality application that "augments" facade images of buildings with visual elements. The recognition of facades is made using natural marks, not requiring fiducial marks.
 
-Esta aplicação integra dois subprogramas que são abstraídos pela aplicação, de forma a haver uma melhor interação com o utilizador. Desta forma, o utilizador tem de navegar por janelas para concluir o seu trabalho. O primeiro subprograma é um programa de preparação onde o utilizador escolhe as regiões das imagens que quer usar para calcular os *keypoints*, desenha marcas em cima das imagens usadas como base de dados, para que estas apareçam sobrepostas com a homografia respetiva nas imagens de teste no programa de “aumento” e escolhe que algoritmo usar no programa de “aumento”, assim como a imagem a testar. Este último subprograma tem como função fazer a comparação entre as imagens da base de dados e a imagem escolhida como teste, apresentando no final os resultados obtidos.
+The MonumentAR application integrates two subprograms, one of preparation and one of augmenting, which is abstracted in order to have a better interaction with the user. Thus, the user does not have to navigate through windows to complete their work.
 
-A aplicação, MonumentAR, foi desenvolvida usando a linguagem de programação *Python* com recurso à biblioteca *OpenCV* para efeitos de “aumento” e à biblioteca *tkinter* para a interface gráfica.
+The preparation subprogram allows the user to choose the regions of the images he wants to use to calculate the key points, to draw the "augmented" elements over the database images so that they appear overlaid on the test images in the "augmented" subprogram. The "augmented" subprogram has the function of comparing the images of the database and the image chosen as a test, calculating the homography matrix and presenting the results obtained.
 
-MonumentAR mostrou-se capaz de resolver os problemas de teste com eficiência, contudo a sua velocidade depende proporcionalmente dos algoritmos escolhidos pelo utilizador.
+The MonumentAR application was developed using the Python programming language, the OpenCV library for "augmented" section and the tkinter library for the graphical interface.
 
-No restante relatório será apresentada primeiramente uma descrição mais detalhada da aplicação, seguindo-se os resultados obtidos, a análise dos mesmos e as conclusões retiradas.
+The program proved to be capable of solving the test problems efficiently, however, its speed depends proportionally on the algorithms chosen by the user and the size of the database. 
+
+A more detailed description of the application will be presented in the next sections of the report, followed by the results obtained, their analysis and the conclusions drawn.
 
 
 ----------------------
 
-# Descrição da Aplicação
+# Application Description
 
-MonumentAR foi desenvolvida usando a linguagem de programação *Python* com recurso à biblioteca *OpenCV* para efeitos de “aumento” e à biblioteca *tkinter* para a interface gráfica. 
+MonumentAR was developed using the Python programming language and the OpenCV library for the "augmented" section and the tkinter library for the graphical interface.
 
-Após o utilizador instalar todas as dependências da aplicação e abrir o script de execução da mesma, é apresentada uma janela onde o utilizador pode efetuar todas as tarefas necessárias.
-O utilizador deverá escolher as imagens que quer utilizar na base de dados. Após este passo o utilizador pode fazer o carregamento de uma das imagens da base de dados e pintar sobre elas as “marcas” que quer apresentar nas futuras imagens a reconhecer. São fornecidas várias ferramentas de edição de imagem, de forma a que o utilizador tenha liberdade. A aplicação guarda as alterações feitas automaticamente. 
-Deverá também carregar na opção Key Points de forma a escolher qual a região da imagem a ser usada para o cálculos dos pontos de interesse da imagem. Poderá efetuar o mesmo processo para as restantes imagens da base de dados.
-Agora que a base de dados está completa o utilizador deverá escolher qual o algoritmo a utilizar, *SIFT*[1] ou *SURF*[2], e escolher a imagem a testar.
-Após estes passos a aplicação mostra os resultados com a imagem de teste a apresentar as marcas escolhidas pelo utilizador com a homografia aplicada. 
+After the user installs all the application dependencies and opens the application execution script, a window is displayed where the 
+user can perform all the necessary tasks. The user must choose the images that he wants to use as a database. After this step, the user can upload one or more images to the database and paint on them the "marks" that he wants to present in the future images to be recognized. Various image editing tools are provided so that the user is free to build marks. After creating them, the user must save the marks.
 
-Quanto à utilização da biblioteca *OpenCV*, foram utilizados os seguintes algoritmos, para a computação de *keypoints*, *descriptors* e matches:
+He should also press the Key Points option to choose which region of the image to use for calculating the points of interest in the
+image and remove the key points that he finds unnecessary. If he does not do this all image is considered for the calculation of the key points. The user can perform the same process for the remaining images that you want to put as a database. You can also access the database and delete or change the marks already made on one of the images. 
+
+If the database is not empty, the user can test different facade images of buildings to see the augmented section on them according to the contents of the database. For this, there are two available algorithms, Scale-Invariant Feature Transform (SIFT) and Speeded-Up Robust Features (SURF). Also, the user can change the value of the the RANSAC threshold. The user can also choose the debug mode where all intermediate steps are displayed in the console and in the graphics.
+
+As for the use of the * OpenCV * library, the following algorithms were used for the computation of * key points *, * descriptors * and matches:
 ```
   SIFT  - Scale-Invariant Feature Transform
   SURF - Speeded-Up Robust Features
@@ -67,17 +71,17 @@ Quanto à utilização da biblioteca *OpenCV*, foram utilizados os seguintes alg
 
 ----------------------
 
-# Resultados
+# Results
 
-Foram gerados problemas de forma a testar a aplicação desenvolvida, com o objetivo de verificar o tempo de execução, se a homografia é calculada corretamente, e que tipo de influências afeta mais cada algoritmo.
+Different images were used, both in the database and in the test images, to test the developed application, to verify the execution time, if the homography matrix is ​​calculated correctly, and what type of influences can change the result of each algorithm. The tests were done using the SIFT and SURF algorithms with different values ​​assigned to the limit of the RANSAC algorithm.
 
-Várias imagens foram utilizadas como base de dados e também como imagem de teste. Para além disso, foi testado o algoritmo *SIFT* com várias imagens (base de dados e de teste) e o mesmo se aplica ao *SURF*. Foram também atribuídos valores diferentes ao valor limite do algoritmo *RANSAC*.
-	
-No que diz respeito ao algoritmo *SIFT*, este de facto é o mais poderoso. Mostrou sempre uma boa solução mesmo quando comparando imagens com diferentes iluminações e poses pouco frontais.
-  
-Quanto ao *SURF*, embora seja mais rápido em tempo de execução do que o *SIFT*, o cálculo da homografia, quando se trata de imagens com diferentes iluminações e poses pouco frontais, dá resultados que se podem classificar como maus. De realçar que a homografia mais correta encontrada foi quando a imagem da base de dados e a de teste eram a mesma. Desta forma, conclui-se que com o *SURF* consegue-se calcular homografias corretas, utilizando os seus *keypoints* e *descriptors* para calcular os matches, contudo, os resultados são susceptíveis a grandes variações dependendo das condições das imagens.
-  
-O *RANSAC* mostrou-se um bom ajudante no cálculo de homografias, eliminando matches incorretos, tendo em conta os restantes. Quanto menor o valor do limite do *RANSAC* mais matches errados são eliminados, resultando um conjunto de *matches* o mais corretos possível para calcular a homografia.
+It has been found that the SIFT algorithm is the most powerful. It always showed a good solution even when comparing images with different illuminations and different poses. 
+
+As for the SURF algorithm, it was verified that, although it is faster in execution time than SIFT, the calculation of the homography, when it comes to images with different illuminations and not exactly frontal poses, it gives results that can be classified as bad. It is noteworthy that the homography that produced the best results considering the key points and descriptors of the SURF algorithm was when the image of the database and the image of the test were the same. Therefore, it can be concluded that with the SURF algorithm it's possible to calculate correct homographies, using SURF's key points and descriptors to calculate the matches, however, the results are susceptible to large variations depending on the lighting conditions and the pose of the images.
+
+The FlannBasedMatcher method of the FLANN library was used to calculate the matches. This method is fairly efficient but matches are generated with only the approximate nearest neighbor, so they may not be the best. To overcome this constraint, the RANSAC algorithm was applied to the generated matches. It proved to be a good helper in calculating homographies, filtering out good matches from the wrong ones and eliminating the latter ones. 
+The lower the value of the RANSAC limit, more erroneous matches are eliminated, resulting in a set of matches as correct as possible to calculate homography since this value represents the maximum allowable variation limit.
+ 
 
 
 ----------------------
