@@ -1,4 +1,4 @@
-#Archivo creador de ventanas
+#File to create windows
 #Autor: Ines Caldas and Joel Carneiro
 
 from lib import *
@@ -17,9 +17,8 @@ def valueBetween(num,x,y):
     if (num>=x) and (num<=y): return True
     else: return False
 
-
+#Icons window
 class pyvi:
-    
     
     #Constructor
     def __init__(self,master, title,icon,type_win,size, properties=[0,0,0,0,0]):
@@ -74,9 +73,8 @@ class pyvi:
         self.root.quit()
         self.root.destroy()
 
-#Clase create windwos
+#Clase create windows
 class pyv:
-    
     
     #Constructor
     def __init__(self,title,icon,type_win,size,properties=[0,0,0,0,0]):
@@ -322,103 +320,26 @@ class pyv:
             F_C.create_line(0,DEFAULT_WIDTH_CANVASTREE[1]/2+2,DEFAULT_WIDTH_CANVASTREE[0]+2,DEFAULT_WIDTH_CANVASTREE[1]/2+1,width=24)
             Label(FA,text=" ").pack(side=LEFT)
             Button(FA,text="Weight 24",relief=GROOVE,command=lambda:self.weight(24),width=7).pack()
-            
-        if type_win=="style":
-            self.styleValues = properties
-            Label(self.root,text="Tool Style",font=DEFAULT_FONT_TITLE,border=10).pack()
-            
-            #New line
-            F = Frame(self.root,border=4)
-            F.pack()
-            F1 = Frame(F)
-            F1.pack(side=LEFT)       
-            Label(F1,text="X - [X>0]",width=9,justify=RIGHT).pack(side=LEFT)
-            self.XPLUS = Entry(F1,width=4)
-            self.XPLUS.insert(0, properties[0])
-            self.XPLUS.pack()
-            F2 = Frame(F)
-            F2.pack()       
-            Label(F2,text="Y - [Y>0]",width=9,justify=RIGHT).pack(side=LEFT)
-            self.YPLUS = Entry(F2,width=4)
-            self.YPLUS.insert(0, properties[1])
-            self.YPLUS.pack()
-            F3 = Frame(self.root,border=4)
-            F3.pack()       
-            Label(F3,text="DASH [N1,N2..]",width=15,justify=RIGHT).pack(side=LEFT)
-            self.DASH = Entry(F3,width=7)
-            self.DASH.insert(0, str(properties[2]).replace("[","").replace("]", "").replace(" ",""))
-            self.DASH.pack()         
-            F4 = Frame(self.root,border=4)
-            F4.pack()       
-            Label(F4,text="SMOOTH [0,1]",width=15,justify=RIGHT).pack(side=LEFT)
-            self.SMOOTH = Entry(F4,width=3)
-            self.SMOOTH.insert(0, str(properties[3]))
-            self.SMOOTH.pack()          
-            F5 = Frame(self.root,border=4)
-            F5.pack()       
-            Label(F5,text="JOINSTYLE (miter, bevel, round)",width=25,justify=RIGHT).pack(side=LEFT)
-            self.JOIN = Entry(F5,width=6)
-            self.JOIN.insert(0, str(properties[4]))
-            self.JOIN.pack()             
-            
-            #Button
-            Label(self.root,text="").pack()
-            FB = Frame(self.root)
-            FB.pack()
-            Button(FB,text="Ok",command=self.enviarEstilo).pack(side=LEFT)
-            Label(FB,text=" ").pack(side=LEFT)
-            Button(FB,text="Restaurar",command=self.restaurarEstilo).pack(side=LEFT)
-            self.defaultProperties=[properties[5][0],properties[5][1],properties[5][2],properties[5][3],properties[5][4]]
-        
-        #Menu insert figure
-        if type_win=="insertfigure":
-            Label(self.root,text="Insert figure",font=DEFAULT_FONT_TITLE,border=10).pack()
-            Button(self.root, text="Arc",command=lambda:self.sendFigure("arc"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Square",command=lambda:self.sendFigure("square"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Image",command=lambda:self.sendFigure("image"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Oval",command=lambda:self.sendFigure("oval"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Polygn",command=lambda:self.sendFigure("polygon"),width=10,relief=GROOVE).pack()
-            Button(self.root, text="Line",command=lambda:self.sendFigure("line"),width=10,relief=GROOVE).pack() 
-            Button(self.root, text="Text",command=lambda:self.sendFigure("text"),width=10,relief=GROOVE).pack()
-            print('a', flush=True)
-            
-        #Menu insert figura
+    
+        #Menu insert text
         if type_win=="inserttext":
             Label(self.root,text="Insert Text",font=DEFAULT_FONT_TITLE,border=10).pack()
             self.texto = Entry(self.root)
             self.texto.pack()
             Label(self.root,text=" ").pack()
-            Button(self.root, text="Write",command=self.enviarTexto,width=10,relief=GROOVE).pack()
+            Button(self.root, text="Write",command=self.sendText,width=10,relief=GROOVE).pack()
             self.texto.focus_force()
             
-        #Menu insertar figura
+        #Menu savefile
         if type_win=="savefile":
             Label(self.root,text="Choose name",font=DEFAULT_FONT_TITLE,border=10).pack()
             self.texto = Entry(self.root)
             self.texto.pack()
             Label(self.root,text=" ").pack()
-            Button(self.root, text="Save",command=self.enviarTexto,width=10,relief=GROOVE).pack()
+            Button(self.root, text="Save",command=self.sendText,width=10,relief=GROOVE).pack()
             self.texto.focus_force()
             
-        #Menu numero de vertices
-        if type_win=="vertices":
-            Label(self.root,text="Numero de vertices",font=DEFAULT_FONT_TITLE,border=10).pack()
-            self.numvertices = Entry(self.root)
-            self.numvertices.pack()
-            Label(self.root,text=" ").pack()
-            Button(self.root, text="Continuar",command=self.enviarVertices,width=10,relief=GROOVE).pack()
-            self.numvertices.focus_force()
-            
-        #Menu numero de vertices
-        if type_win=="arc":
-            Label(self.root,text="Longitud del arco",font=DEFAULT_FONT_TITLE,border=10).pack()
-            self.arc = Entry(self.root)
-            self.arc.pack()
-            Label(self.root,text=" ").pack()
-            Button(self.root, text="Continuar",command=self.enviarArco,width=10,relief=GROOVE).pack()
-            self.arc.focus_force()
-        
-        #Menu numero de vertices
+        #Menu save
         if type_win=="save":
             lib("sonido","alerta")
             Label(self.root,text="Save?",font=DEFAULT_FONT_TITLE,border=10).pack()
@@ -430,130 +351,39 @@ class pyv:
             
         #About
         if type_win=="about":
-            Label(self.root,text="Creador: "+properties[0],font=DEFAULT_FONT_TITLE,border=5).pack()
-            Label(self.root,text="Mail: "+properties[2],font=DEFAULT_FONT_TITLE,border=5).pack()
+            Label(self.root,text="Creators"+properties[0],font=DEFAULT_FONT_TITLE,border=5).pack()
             Label(self.root,text="Version: "+str(properties[1]),font=DEFAULT_FONT_TITLE,border=5).pack()
-            Button(self.root, text="Cerrar",command=self.root.destroy).pack()
-            
-        #Licencia o gnu
-        if type_win=="licence" or type_win=="changelog" or type_win=="ayuda":
-            archivo = open(properties[1],"r")
+            Button(self.root, text="Close",command=self.root.destroy).pack()
+
+        #License
+        if type_win=="license" or type_win=="changelog" or type_win=="help":
+            archive = open(properties[1],"r")
             Yscroll = Scrollbar(self.root)
             Yscroll.pack(side=RIGHT, fill=Y)
-            texto = Text(self.root,wrap=NONE,
+            text = Text(self.root,wrap=NONE,
             yscrollcommand=Yscroll.set)
-            texto.focus_force()
-            for i in archivo: texto.insert(INSERT,i)
-            texto.pack()
-            texto.configure(state="disabled")
-            Yscroll.config(command=texto.yview)
-            archivo.close()
+            text.focus_force()
+            for i in archive: text.insert(INSERT,i)
+            text.pack()
+            text.configure(state="disabled")
+            Yscroll.config(command=text.yview)
+            archive.close()
         
-        if type_win == 'icons':
-            
-            F = Frame(self.root)
-            F.pack()
-
-            FiguresInsert = Frame(F)
-            FiguresInsert.pack()
-        
-            
-            files = glob.glob('Data\icons_gui\*')
-            
-            i,j = 0,0          
-            for icon_file in files:
-            
-                b_line = ttk.Button(FiguresInsert,text="Insert Icon", command=lambda:self.sendIcon(icon_file), width=20, style="TButton")
-                images = Image.open(icon_file)
-                images = images.resize((32,32), Image.ANTIALIAS)
-                images = ImageTk.PhotoImage(file='Data\icons_gui\\test.gif')
-                b_line.config(image=images)
-                b_line.image = images
-                b_line.grid(row=j, column=i)
-                
-                i = i + 1
-                if(i > 4):
-                    i = 0
-                    j = j + 1
-            
-            #b_cancel = ttk.Button(FiguresInsert, text="No",command=lambda:self.sendIcon("no"),width=5)
-            #b_cancel.grid(columnspan = 5, pady = 10)
-            
-
-    #Asignar un numero de vertices para dibujar
-    def sendIcon(self, filepath):
-        print(filepath, flush=True)
-        self.value = filepath
+    #Sends response to gui
+    def response(self,resp):
+        if resp=="yes": self.value = True
+        if resp=="no": self.value = False
         self.root.destroy()
-
-    #Ingresa colores programados
-    def putcolor(self,colorText):
-        self.color.config(text=colorText)
-        self.value = colorText
-        
-    #Funcion que envia una respuesta
-    def response(self,respuesta):
-        if respuesta=="yes": self.value = True
-        if respuesta=="no": self.value = False
-        self.root.destroy()
-        
+ 
     #Enviar un texto
-    def enviarTexto(self):
+    def sendText(self):
         text = self.texto.get()
         if len(text)>0:
             self.value=text
             self.root.destroy()
-        
-    #Enviar una figura
-    def sendFigure(self,figura):
-        self.value = figura
-        self.root.destroy()
-        
-    #Enviar estilo
-    def enviarEstilo(self):
-        x = self.XPLUS.get()
-        y = self.YPLUS.get()
-        dash = self.DASH.get()
-        smooth = self.SMOOTH.get()
-        join = self.JOIN.get().lower()
-        if x.isdigit() and x!="":
-            x= int(x)
-            if x>0: self.styleValues[0]=x
-        if y.isdigit() and y!="":
-            y=int(y)
-            if y>0: self.styleValues[1]=y
-        if dash.replace(",","").replace(" ","").isdigit():
-            dash = dash.split(",")
-            k=0
-            j=0
-            for i in dash:
-                if not valueBetween(int(i),1,255): k+=1
-                dash[j]=int(dash[j])
-                j+=1
-            if k==0: self.styleValues[2]=dash
-        if smooth.isdigit() and smooth!="":
-            smooth=int(smooth)
-            if valueBetween(smooth,0,1): self.styleValues[3]=smooth
-        if join=="miter" or join=="bevel" or join=="round": self.styleValues[4]=join       
-        self.root.destroy()
-        
-    #Restaurar el estilo
-    def restaurarEstilo(self):
-        self.styleValues[0]=self.defaultProperties[0]
-        self.styleValues[1]=self.defaultProperties[1]
-        self.styleValues[2]=self.defaultProperties[2]
-        self.styleValues[3]=self.defaultProperties[3]
-        self.styleValues[4]=self.defaultProperties[4]
-        self.root.destroy()
-        
-    #Ingresar weightes
+    
+    #Send weightes
     def weight(self,weightLine):
         self.value = weightLine
         self.root.destroy()
      
-        
-    #Ingresar color personalizado
-    def colorPersonalizado(self):
-        colorCreated = pyv("Color Personalizado","Data/Icons/palete.ico","createColor",(250,150))
-        colorCreated.root.mainloop(2)
-        if colorCreated.value!=0: self.putcolor(colorCreated.value)

@@ -34,15 +34,15 @@ DATABASE_PATH = '../database/images/'
 DATABASE_LAYERS = '../database/layers/'
 
 #Program Information
-VERSION = 5.0,1.0
-AUTOR = "Ines Caldas and Joel Carneiro"
+VERSION = 1.0,1.0
+AUTOR = "\nInês Caldas\nJoel Carneiro"
 PROGRAM_TITLE = "MonumentAR"
 
 #Configuration file
 CONFIGURATION_FILE = PROGRAM_TITLE+".ini"
 
 #Default configuration
-C_DATA = [[1024, 768],"#000000","#FFFFFF","#FFFFFF",[5,5,[1,1],0,"miter"],2,3,"EN"]
+C_DATA = [[1150, 768],"#000000","#FFFFFF","#FFFFFF",[5,5,[1,1],0,"miter"],2,3,"EN"]
 
 #Load Settings and Update C_DATA
 try:
@@ -96,8 +96,8 @@ DEFAULT_TOOL_WEIGHT = C_DATA[5]
 DEFAULT_TOOL = C_DATA[6]
 
 
-LINE, OVAL, RECTANGLE, ARC, TEXT = list(range(5))
-PENCIL, THIN, THICK = list(range(3))
+LINE, OVAL, RECTANGLE, TEXT = list(range(4))
+PENCIL, BRUSH = list(range(2))
 
 #Class paint
 class Paint:
@@ -196,19 +196,16 @@ class Paint:
             settingsMenu = Menu(menuBar,tearoff=0)
             colorMenu = Menu(settingsMenu,tearoff=0)
             settingsMenu.add_cascade(label="Change Color",menu=colorMenu)
-            colorMenu.add_command(label="Background",command=lambda:self.colorChange("background"))
-            colorMenu.add_command(label="Main",command=lambda:self.colorChange("active"))
-            settingsMenu.add_command(label="Tool Style",command=self.styleToolChange)
+            colorMenu.add_command(label="Color 1",command=lambda:self.colorChange("active"))
+            colorMenu.add_command(label="Color 2",command=lambda:self.colorChange("background"))
             settingsMenu.add_command(label="Tool Weight",command=self.toolWeightChange)
             menuBar.add_cascade(label="Settings",menu=settingsMenu)
 
             #Insert
             insertMenu = Menu(menuBar,tearoff=0)
-            insertMenu.add_command(label="Arc",command= lambda: self.createFigure("arc"))
+            #TODO: insertMenu.add_command(label="Arc",command= lambda: self.createFigure("arc"))
             insertMenu.add_command(label="Square",command= lambda: self.createFigure("square"))
-            insertMenu.add_command(label="Image",command= lambda: self.createFigure("image"))
             insertMenu.add_command(label="Oval",command= lambda: self.createFigure("oval"))
-            insertMenu.add_command(label="Polygn",command= lambda: self.createFigure("polygn"))
             insertMenu.add_command(label="Line",command= lambda: self.createFigure("line"))
             insertMenu.add_command(label="Text",command= lambda: self.createFigure("text"))
             menuBar.add_cascade(label="Insert",menu=insertMenu)
@@ -217,19 +214,17 @@ class Paint:
             toolsMenu = Menu(menuBar,tearoff=0)
             tMenu = Menu(toolsMenu,tearoff=0)
             tMenu.add_command(label="Pencil",command=lambda:self.tools("pencil"))
-            tMenu.add_command(label="Thin Brush",command=lambda:self.tools("brushthin"))
-            tMenu.add_command(label="Thick Brush",command=lambda:self.tools("brushthick"))
+            tMenu.add_command(label="Brush",command=lambda:self.tools("brush"))
             menuBar.add_cascade(label="Tools",menu=tMenu)
 
-            """
+
             #Help
             Help = Menu(menuBar,tearoff=0)
-            Help.add_command(label="Acerca de",command=self.acercade)
-            Help.add_command(label="help    [Ctrl-A]",command=self.help)
+            Help.add_command(label="About",command=self.about)
+            Help.add_command(label="Help    [Ctrl-h]",command=self.help)
             Help.add_command(label="Changelog",command=self.changelog)
-            Help.add_command(label="Licencia",command=self.licence)
-            menuBar.add_cascade(label="help",menu=Help)
-            """
+            Help.add_command(label="License",command=self.license)
+            menuBar.add_cascade(label="Help",menu=Help)
 
             #Draw Frame
             ParentFrame = Frame(self.main, background=palette.BACKGROUND_WINDOW)
@@ -255,29 +250,45 @@ class Paint:
             #Buttons
             Buttonframe = Frame(ParentFrame,border=5, background=palette.BACKGROUND_WINDOW)
             Buttonframe.grid(row=0, column=1, sticky="NW")
-            Label(Buttonframe,text="Tools",border=10).pack()
-            
-            ttk.Button(Buttonframe,text="Insert Icons",width=20,command=self.insertIcons, style="Wild.TButton").pack()
+            label = Label(Buttonframe,text="Tools",border=10, background=palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY)
+            label.config(font=("Courier", 18, 'bold'))
+            label.pack()
 
-            b_undo = ttk.Button(Buttonframe,text="Undo",width=20,command=self.undoElement, style="TButton")
+            #Tools
+
+            ToolsFrame = Frame(Buttonframe)
+            ToolsFrame.pack()
+
+            b_undo = ttk.Button(ToolsFrame,text="Undo",width=20,command=self.undoElement, style="TButton")
             image_undo = Image.open(DATAICONS + "eraser.png")
             image_undo = image_undo.resize((32,32), Image.ANTIALIAS)
             image_undo = ImageTk.PhotoImage(image_undo)
             b_undo.config(image=image_undo)
-            
-            b_undo.pack()
+            b_undo.pack(side=LEFT)
 
-            b_pencil = ttk.Button(Buttonframe,text="Pencil",width=20,command=lambda:self.tools("pencil"), style="TButton")
+            b_pencil = ttk.Button(ToolsFrame,text="Pencil",width=20,command=lambda:self.tools("pencil"), style="TButton")
             image_pencil = Image.open(DATAICONS + "pencil.png")
             image_pencil = image_pencil.resize((32,32), Image.ANTIALIAS)
             image_pencil = ImageTk.PhotoImage(image_pencil)
             b_pencil.config(image=image_pencil)
-            b_pencil.pack()
+            b_pencil.pack(side=LEFT)
 
-            ttk.Button(Buttonframe,text="Thin Brush",width=20,command=lambda:self.tools("brushthin"), style="TButton").pack()
-              
-            ttk.Button(Buttonframe,text="Thick Brush",width=20,command=lambda:self.tools("brushthick"), style="TButton").pack()
-            
+            b_brush = ttk.Button(ToolsFrame,text="Brush",width=20,command=lambda:self.tools("brush"), style="TButton")
+            image_brush = Image.open(DATAICONS + "brush.png")
+            image_brush = image_brush.resize((32,32), Image.ANTIALIAS)
+            image_brush = ImageTk.PhotoImage(image_brush)
+            b_brush.config(image=image_brush)
+            b_brush.pack(side=LEFT)
+
+            b_text = ttk.Button(ToolsFrame,text="Text",width=20,command= lambda: self.createFigure("text"), style="TButton")
+            image_text = Image.open(DATAICONS + "text.png")
+            image_text = image_text.resize((32,32), Image.ANTIALIAS)
+            image_text = ImageTk.PhotoImage(image_text)
+            b_text.config(image=image_text)
+            b_text.pack(side=LEFT)
+
+            #ttk.Button(Buttonframe,text="Brush",width=20,command=lambda:self.tools("brush"), style="TButton").pack()
+                          
             #Insert Figures
             FiguresInsert = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             FiguresInsert.pack()
@@ -303,15 +314,17 @@ class Paint:
             b_oval.config(image=image_oval)
             b_oval.pack(side=LEFT)
 
-            b_arc = ttk.Button(FiguresInsert,text="Insert Arc",width=20,command=lambda:self.createFigure('arc'), style="TButton")
-            image_arc = Image.open(DATAICONS + "arc.png")
-            image_arc = image_arc.resize((32,32), Image.ANTIALIAS)
-            image_arc = ImageTk.PhotoImage(image_arc)
-            b_arc.config(image=image_arc)
-            b_arc.pack(side=LEFT)
+            b_icon = ttk.Button(FiguresInsert,text="Insert Icons",width=20,command=self.insertIcons, style="Wild.TButton")
+            image_icon = Image.open(DATAICONS + "icon.png")
+            image_icon = image_icon.resize((32,32), Image.ANTIALIAS)
+            image_icon = ImageTk.PhotoImage(image_icon)
+            b_icon.config(image=image_icon)
+            b_icon.pack(side=LEFT)
             
             #Tools info
-            Label(Buttonframe,text="tools",border=10).pack()
+            label = Label(Buttonframe,text="Settings",border=10, background=palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY)
+            label.config(font=("Courier", 18, 'bold'))
+            label.pack()
             WeightPencil = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             WeightPencil.pack()
             self.infoWeightPencil = Label(WeightPencil,text=str(self.toolWeight),border=3,font=10,width=2)
@@ -319,12 +332,6 @@ class Paint:
             Label(WeightPencil,text="  ").pack(side=LEFT)
             ttk.Button(WeightPencil,text="Weight",command=self.toolWeightChange,width=9).pack()
             
-            PencilStyle = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
-            PencilStyle.pack()
-            Label(PencilStyle,text=" ",border=3,font=10,width=2).pack(side=LEFT)
-            Label(PencilStyle,text="  ").pack(side=LEFT)
-            ttk.Button(PencilStyle,text="Style",command=self.styleToolChange,width=9).pack()
-
             #Color Information
             Label(Buttonframe,text="Colors",border=10).pack()
             activeColor = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
@@ -354,21 +361,26 @@ class Paint:
             activeColor = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             activeColor.pack()
             
-            #Info for user
-            Label(Buttonframe,height=1).pack()
-            self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=5,justify=CENTER,wraplength=125)
-            self.messageUser.pack()
+            
 
             #Vision Buttons
-            Label(Buttonframe,text="Vision",border=10).pack()
+            label = Label(Buttonframe,text="Vision",border=10, bg = palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY)
+            label.config(font=("Courier", 18, 'bold'))
+            label.pack()
             ttk.Button(Buttonframe,text="Add image",width=20,command=self.addImageDatabase, style="TButton").pack()
             ttk.Button(Buttonframe,text="Key Points",width=20,command=self.computeKeyPoints).pack()
             ttk.Button(Buttonframe,text="SIFT",width=20,command=lambda:self.arApp('sift')).pack()
             ttk.Button(Buttonframe,text="SURF",width=20,command=lambda:self.arApp('surf')).pack()
             ttk.Button(Buttonframe,text="Database",width=20,command=self.seeDatabase).pack()
 
+            #Info for user
+            Label(Buttonframe,height=1, background=palette.CANVAS_COLOR).pack()
+            self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=5,justify=CENTER,wraplength=125, background=palette.CANVAS_COLOR)
+            self.messageUser.config(fg=palette.LIGHT_GRAY)
+            self.messageUser.pack(side=BOTTOM)
+
             # add bindings for clicking, dragging and releasing over
-            # any object with the "icon" tag
+            # any object with the "token" tag
 
             # this data is used to keep track of an 
             # item being dragged
@@ -404,7 +416,7 @@ class Paint:
     #Free draw
     def freeDraw(self,event):
         
-        if self.activeTool==PENCIL or self.activeTool==THIN or self.activeTool==THICK:
+        if self.activeTool==PENCIL or self.activeTool==BRUSH:
             colorpaint = self.activeColor
         
         if self.toolWeight==1:
@@ -424,7 +436,7 @@ class Paint:
             self.befpoint = [event.x,event.y]
         
         else:
-            if self.activeTool==THIN:
+            if self.activeTool==BRUSH:
                 elementS = self.screenSave.create_rectangle(event.x,event.y,event.x+self.toolStyle[0],event.y+\
                                   self.toolStyle[1],dash=self.toolStyle[2],\
                                   width=self.toolWeight,fill=colorpaint,outline = colorpaint)
@@ -434,17 +446,6 @@ class Paint:
                 
                 self.stackElements.append(element)
                 self.stackElementsSave.append(elementS)           
-            
-            elif self.activeTool==THICK:
-                element = self.screen.create_oval(event.x,event.y,event.x+self.toolStyle[0],event.y+\
-                                  self.toolStyle[1],dash=self.toolStyle[2],\
-                                  width=self.toolWeight,fill=colorpaint,outline = colorpaint)
-                elementS = self.screenSave.create_oval(event.x,event.y,event.x+self.toolStyle[0],event.y+\
-                                  self.toolStyle[1],dash=self.toolStyle[2],\
-                                  width=self.toolWeight,fill=colorpaint,outline = colorpaint)
-                
-                self.stackElements.append(element)
-                self.stackElementsSave.append(elementS)
             
             else:
                 element = self.screen.create_line(event.x,event.y,event.x+self.toolStyle[0],event.y+\
@@ -459,7 +460,7 @@ class Paint:
         
         self.draw = True
 
-    #New image
+    #New image database menu bar
     def newImage(self,i="null"):
         if self.draw:
             resp = pyv("Save",DATAICONS+"alert.ico","save",(250,80))
@@ -467,7 +468,7 @@ class Paint:
             if resp.value!=0:
                 if resp.value: self.saveImageLayer()
         self.messageUser.config(text="")
-        self.screen.create_rectangle(0,0,2*PROGRAM_SIZE[0], 2*PROGRAM_SIZE[1],fill=DEFAULT_BACKGROUND)
+        self.addImageDatabase()
         self.draw = False
 
     #Save imagen
@@ -517,10 +518,8 @@ class Paint:
     #Save Color Tools    - active, eraser
     def colorChange(self,tools):
         color = askcolor()
-        print('color', color[1], flush=True)
         color = color[1]
         if((color == '#ffffff' ) | (color == '#FFFFFF')):
-            print('white', flush=True)
             color = '#fefefe'
             
         if color!=0:
@@ -541,23 +540,7 @@ class Paint:
         if a.value!=0:
             self.toolWeight = a.value
             self.infoWeightPencil.config(text=str(a.value))
-
-    #Change tools style
-    def styleToolChange(self):
-        a = pyv("Tools Style",DATAICONS+\
-                "estilo.ico","style",(260,210),[self.toolStyle[0],self.toolStyle[1],\
-                                                 self.toolStyle[2],self.toolStyle[3],\
-                                                 self.toolStyle[4],[DEFAULT_TOOL_STYLE[0],\
-                                                                            DEFAULT_TOOL_STYLE[1],\
-                                                                            DEFAULT_TOOL_STYLE[2],\
-                                                                            DEFAULT_TOOL_STYLE[3],\
-                                                                            DEFAULT_TOOL_STYLE[4]]])
-        a.root.mainloop(1)
-        self.toolStyle[0] = a.styleValues[0]
-        self.toolStyle[1] = a.styleValues[1]
-        self.toolStyle[2] = a.styleValues[2]
-        self.toolStyle[3] = a.styleValues[3]
-        self.toolStyle[4] = a.styleValues[4]
+    
 
     #Insert Icons
     def insertIcons(self,E=False):
@@ -565,39 +548,6 @@ class Paint:
         a.root.mainloop(0)  
         self._create_icon(a.value)
     
-    #Retornar la posicion del mouse en dos posiciones y crear alguna figurilla
-    def callbackPos(self,event):
-        if self.pos[0]==[0,0]:
-            self.pos[0][0]=event.x
-            self.pos[0][1]=event.y
-        else:
-            self.pos[1][0]=event.x
-            self.pos[1][1]=event.y
-            if self.activeFigure==1:
-                self.screen.create_rectangle(self.pos[0][0],self.pos[0][1],self.pos[1][0],self.pos[1][1],\
-                                               fill=self.backgroundColor,outline=self.activeColor)
-                
-            if self.activeFigure==2:
-                self.screen.create_oval(self.pos[0][0],self.pos[0][1],self.pos[1][0],self.pos[1][1],\
-                                          fill=self.backgroundColor,outline=self.activeColor)
-                
-            if self.activeFigure==3:
-                self.screen.create_line(self.pos[0][0],self.pos[0][1],self.pos[1][0],self.pos[1][1],\
-                                          fill=self.backgroundColor,width=self.toolWeight)
-        
-            if self.activeFigure==5:
-                a = pyv("Crear arco",DATAICONS+"arc.ico","arco",(260,115))
-                self.messageUser.config(text="Ingrese los grados de su arco, 0 para cancelar")
-                a.root.mainloop(1)
-                if a.value>0:
-                    self.screen.create_arc(self.pos[0][0],self.pos[0][1],self.pos[1][0],self.pos[1][1],\
-                                               fill=self.backgroundColor,outline=self.activeColor, extent=a.value)
-            self.draw = True
-            self.screen.bind("<ButtonPress-1>",self.breakpoint)
-            self.tools(self.activeTool)
-            self.pos=[[0,0],[0,0]]
-            self.messageUser.config(text="")
-
     #Create Text
     def createText(self,event):
         txt = pyv("Write text",DATAICONS+"text.ico","inserttext",(250,110))
@@ -635,56 +585,21 @@ class Paint:
             self.activeFigure = TEXT
             self.screen.bind("<ButtonPress-1>",self.createText)
             self.messageUser.config(text="Click where to put text")
-        if figura=="arc":
-            self.screen.bind("<ButtonPress-1>",self.update_xy)
-            self.screen.bind("<B1-Motion>",self.drawFigure)
-            self.activeFigure = ARC
-            self.messageUser.config(text="Drag to create arc")   
-            
 
-        if figura =="polygn":
-            a = pyv("Numero de aristas",DATAICONS+"shaperound.ico","vertices",(260,115))
-            self.messageUser.config(text="Ingrese el numero de aristas que tendra su nueva figura, 0 para cancelar")
-            a.root.mainloop(1)
-            self.activeFigure = 4
-            self.vertices = a.value
-            if self.vertices>0:
-                self.screen.bind("<ButtonPress-1>",self.crearPoligono)
-                self.screen.bind("<B1-Motion>",self.breakpoint)
-                self.messageUser.config(text="Haga click en la screen para definir los vertices de su figura, "+str(self.vertices)+" restantes")
-            else:
-                self.messageUser.config(text="")
-
-    #Change tools - eraser, pencil, brushthin, brushthick
+    #Change tools - eraser, pencil, brush
     def tools(self,herr):
         if herr=="pencil" or herr==1: self.activeTool=PENCIL
-        if herr=="brushthin" or herr==3: self.activeTool=THIN
-        if herr=="brushthick" or herr==4: self.activeTool=THICK
+        if herr=="brush" or herr==3: self.activeTool=BRUSH
         self.screen.bind("<B1-Motion>",self.freeDraw)
 
     #Load window with help
     def help(self,i="null"):
-        a = pyv("help",DATAICONS+"help.ico","help",(600,400),[PROGRAM_TITLE,DATADOCS+"help.TXT"])
+        a = pyv("help",DATAICONS+"help.ico","help",(600,400),[PROGRAM_TITLE,DATADOCS+"HELP.TXT"])
         a.root.mainloop(0)
 
-    #Insert image
-    def insertImage(self,event):
-        imagen = PhotoImage(file=self.mainArchive)
-        self.screen.create_image(event.x,event.y,image=imagen)
-        self.screen.update()
-        imagen.name=None
-
-    #Terminar de poner las imagenes
-    def terminarImagen(self,i):
-        self.messageUser.config(text="")
-        self.screen.bind("<B1-Motion>",self.freeDraw)
-        self.screen.bind("<ButtonPress-1>",self.breakpoint)
-        self.mainArchive=""
-        self.main.bind("<Escape>",self.breakpoint)
-
-    #Cargar el acercade
-    def acercade(self,i="null"):
-        a = pyv("Acerca de "+PROGRAM_TITLE,DATAICONS+"coloricon.ico","about",(220,120),[AUTOR,VERSION[0],AUTORMAIL])
+    #Load About
+    def about(self,i="null"):
+        a = pyv("About "+PROGRAM_TITLE,DATAICONS+"coloricon.ico","about",(220,120),[AUTOR,VERSION[0]])
         a.root.mainloop(0)
 
     #Posicionar puntero
@@ -696,12 +611,12 @@ class Paint:
         a = pyv("Changelog",DATAICONS+"changelog.ico","changelog",(600,400),[PROGRAM_TITLE,DATADOCS+"CHANGELOG.TXT"])
         a.root.mainloop(0)
 
-    #Licencia del programa
-    def licence(self):
-        a = pyv("Licencia GNU [English]",DATAICONS+"gnu.ico","licence",(600,400),[PROGRAM_TITLE,DATADOCS+"GNU.TXT"])
+    #License of the program
+    def license(self):
+        a = pyv("Licencia GNU [English]",DATAICONS+"gnu.ico","license",(600,400),[PROGRAM_TITLE,DATADOCS+"GNU.TXT"])
         a.root.mainloop(0)
 
-    #Funcion para exit
+    #Exit function
     def breakpoint(self,breakeable):
         return
 
@@ -711,7 +626,7 @@ class Paint:
         if self.activeFigure is None or self._obj is None:
             return
         x, y = self.lastx, self.lasty
-        if self.activeFigure in (LINE, RECTANGLE, OVAL, ARC):
+        if self.activeFigure in (LINE, RECTANGLE, OVAL):
             self.screen.coords(self._obj, (x, y, event.x, event.y))
             self.screenSave.coords(self._objSave, (x, y, event.x, event.y))
 
@@ -732,10 +647,6 @@ class Paint:
             self._obj = self.screen.create_oval((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
             self._objSave = self.screenSave.create_oval((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
         
-        elif self.activeFigure == ARC:
-            self._obj = self.screen.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
-            self._objSave = self.screenSave.create_arc((x, y, x, y), fill=self.backgroundColor,outline=self.activeColor, tags='token')
-        
         elif self.activeFigure == TEXT:
             self._obj = self.screen.create_text(x, y,text='a',font="Arial", tags='token')
             self._objSave = self.screen.create_text(x, y,text='a',font="Arial", tags='token')
@@ -746,7 +657,6 @@ class Paint:
         self.stackElementsSave.append(elementS)
         self.draw = True
         self.lastx, self.lasty = x, y
-
 
     #Token Drag
     def _create_icon(self, filepath):
@@ -782,7 +692,6 @@ class Paint:
 
     def on_token_motion(self, event):
         if(self._drag_data["item"] != None):
-            print('draggin item', self._drag_data["item"])
             '''Handle dragging of an object'''
             # compute how much the mouse has moved
             delta_x = event.x - self._drag_data["x"]
@@ -794,7 +703,6 @@ class Paint:
             self._drag_data["x"] = event.x
             self._drag_data["y"] = event.y
             self.draw = True
-
 
     ###########################
     #Vision
