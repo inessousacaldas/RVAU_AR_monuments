@@ -18,7 +18,7 @@ def valueBetween(num,x,y):
     else: return False
 
 #Icons window
-class pyvi:
+class iconWin:
     
     #Constructor
     def __init__(self,master, title,icon,type_win,size, properties=[0,0,0,0,0]):
@@ -74,7 +74,7 @@ class pyvi:
         self.root.destroy()
 
 #Clase create windows
-class pyv:
+class popWin:
     
     #Constructor
     def __init__(self,title,icon,type_win,size,properties=[0,0,0,0,0]):

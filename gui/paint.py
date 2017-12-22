@@ -11,7 +11,7 @@ from vision.choose import select_region, keypoints_default
 from vision.ar_labeling import arAppCompute
 from vision.utils import get_number_of_files, get_image_index
 import vision.database as vdb
-from gui.pyv import *
+from gui.popWin import *
 import gui.palette as palette
 from gui.showDatabase import *
 
@@ -159,27 +159,6 @@ class Paint:
             self.main.bind("<Control-H>",self.help)
             
 
-            #Buttons Style
-            """
-            s = ttk.Style()
-            s.configure("TButton", padding=6, background="blue")
-            s.configure('Wild.TButton',
-                background='black',
-                foreground='white',
-                highlightthickness='20',
-                font=('Helvetica', 10, 'bold'))
-            s.map('Wild.TButton',
-                foreground=[('disabled', 'yellow'),
-                            ('pressed', 'red'),
-                            ('active', 'blue')],
-                background=[('disabled', 'magenta'),
-                            ('pressed', '!focus', 'cyan'),
-                            ('active', 'green')],
-                highlightcolor=[('focus', 'green'),
-                                ('!focus', 'red')],
-                relief=[('pressed', 'groove'),
-                        ('!pressed', 'ridge')])
-            """
             #Menu
             menuBar = Menu(self.main)
             self.main.config(menu=menuBar)
@@ -484,7 +463,7 @@ class Paint:
     #New image database menu bar
     def newImage(self,i="null"):
         if self.draw:
-            resp = pyv("Save",DATAICONS+"alert.ico","save",(250,80))
+            resp = popWin("Save",DATAICONS+"alert.ico","save",(250,80))
             resp.root.mainloop(1)
             if resp.value!=0:
                 if resp.value: self.saveImageLayer()
@@ -497,7 +476,7 @@ class Paint:
         if self.draw:
             self.screen.update()
             self.screenSave.update()
-            txt = pyv("Save",DATAICONS+"save.ico","save",(250,110))
+            txt = popWin("Save",DATAICONS+"save.ico","save",(250,110))
             txt.root.mainloop(1)
             print(txt.value, flush=True)
             
@@ -530,7 +509,7 @@ class Paint:
     #exit the program
     def exit(self,i="null"):
         if self.draw:
-            resp = pyv("Save",DATAICONS+"alert.ico","saveIt",(250,80))
+            resp = popWin("Save",DATAICONS+"alert.ico","saveIt",(250,80))
             resp.root.mainloop(1)
             if resp.value!=0:
                 if resp.value: self.saveImageLayer()
@@ -556,7 +535,7 @@ class Paint:
 
     #Change weight of tools
     def toolWeightChange(self):
-        a = pyv("Tools Weight",DATAICONS+"grosor.ico","weight",(260,450))
+        a = popWin("Tools Weight",DATAICONS+"grosor.ico","weight",(260,450))
         a.root.mainloop(1)
         if a.value!=0:
             self.toolWeight = a.value
@@ -565,13 +544,13 @@ class Paint:
 
     #Insert Icons
     def insertIcons(self,E=False):
-        a = pyvi(self.main, "Insert icons",DATAICONS+"shaperound.ico","icons", (230,460))
+        a = iconWin(self.main, "Insert icons",DATAICONS+"shaperound.ico","icons", (230,460))
         a.root.mainloop(0)  
         self._create_icon(a.value)
     
     #Create Text
     def createText(self,event):
-        txt = pyv("Write text",DATAICONS+"text.ico","inserttext",(250,110))
+        txt = popWin("Write text",DATAICONS+"text.ico","inserttext",(250,110))
         txt.root.mainloop(1)
         self.messageUser.config(text="")
         _font = tkFont.Font(size = self.toolWeight + 10, weight='bold')
@@ -614,12 +593,12 @@ class Paint:
 
     #Load window with help
     def help(self,i="null"):
-        a = pyv("help",DATAICONS+"help.ico","help",(600,400),[PROGRAM_TITLE,DATADOCS+"HELP.TXT"])
+        a = popWin("help",DATAICONS+"help.ico","help",(600,400),[PROGRAM_TITLE,DATADOCS+"HELP.TXT"])
         a.root.mainloop(0)
 
     #Load About
     def about(self,i="null"):
-        a = pyv("About "+PROGRAM_TITLE,DATAICONS+"coloricon.ico","about",(220,120),[AUTOR,VERSION[0]])
+        a = popWin("About "+PROGRAM_TITLE,DATAICONS+"coloricon.ico","about",(220,120),[AUTOR,VERSION[0]])
         a.root.mainloop(0)
 
     #Posicionar puntero
@@ -628,12 +607,12 @@ class Paint:
 
     #Lista de cambios del programa
     def changelog(self):
-        a = pyv("Changelog",DATAICONS+"changelog.ico","changelog",(600,400),[PROGRAM_TITLE,DATADOCS+"CHANGELOG.TXT"])
+        a = popWin("Changelog",DATAICONS+"changelog.ico","changelog",(600,400),[PROGRAM_TITLE,DATADOCS+"CHANGELOG.TXT"])
         a.root.mainloop(0)
 
     #License of the program
     def license(self):
-        a = pyv("Licencia GNU [English]",DATAICONS+"gnu.ico","license",(600,400),[PROGRAM_TITLE,DATADOCS+"GNU.TXT"])
+        a = popWin("Licencia GNU [English]",DATAICONS+"gnu.ico","license",(600,400),[PROGRAM_TITLE,DATADOCS+"GNU.TXT"])
         a.root.mainloop(0)
 
     #Exit function

@@ -9,7 +9,7 @@ gui/dummySound.py
 gui/lib.py
 gui/paint.py
 gui/palette.py
-gui/pyv.py
+gui/popWin.py
 gui/showDatabase.py
 vision/__init__.py
 vision/ar_labeling.py

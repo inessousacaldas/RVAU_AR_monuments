@@ -8,6 +8,7 @@ import numpy as np
 DATABASE_PATH = '..\database\images\*'
 LAYER_AR_PATH = '..\database\layers\\'
 
+#Get the greater image number as index
 def get_image_index():
     index = 1
     files = glob.glob(DATABASE_PATH)
@@ -17,9 +18,9 @@ def get_image_index():
         index = basename(filename).replace('img', '')
         index = int(index) + 1
     
-    print('index', index)
     return index
 
+#Get the number of files in database images
 def get_number_of_files():
 
     files = glob.glob(DATABASE_PATH)
