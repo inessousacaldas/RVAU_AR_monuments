@@ -113,4 +113,4 @@ def keypoints_default(image_path, debug_bool):
 
 
 
-select_region('..\database\images\img1.jpg', False)
+#select_region('..\database\images\img1.jpg', False)
