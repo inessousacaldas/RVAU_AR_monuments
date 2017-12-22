@@ -4,7 +4,6 @@ from time import time
 from matplotlib import pyplot as plt
 from vision.utils import blend_transparent
 
-debug_variable = None
 # Minimum number of matches 
 MIN_MATCH_COUNT = 15
 
@@ -39,7 +38,7 @@ def calculate_matches(image_des, database_des):
 
 # Computes the homography between the test image and the image with the higher number of best matches
 # Shows the findings with the correct homography
-def compute_homography(test_image_path, test_image, database_image, layerAR, matches,ransac_value):
+def compute_homography(test_image_path, test_image, database_image, layerAR, matches,ransac_value,debug_bool):
 
     #kp_database_image/test_image = [img, kp, des]
     layerAR_img = cv2.imread(layerAR, 0)
@@ -70,7 +69,7 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
         result = cv2.warpPerspective(coloredLayerAr, M,(w,h))
     
         # show findings
-        if debug_variable:
+        if debug_bool:
             print(layerAR_img.shape, flush=True)
             print(src.shape, flush=True)
             
@@ -78,7 +77,7 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
         merge = cv2.addWeighted(layerAR_img,0.5,src_gray,0.5,0)
         merge_final = blend_transparent(dst_rgb, result)
 
-        if debug_variable:
+        if debug_bool:
             cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
             cv2.resizeWindow('res', 300, 300)
             cv2.imshow('res',result)
@@ -118,8 +117,7 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
         print('The minimum of %s matches was not reached. Please try it agin later...' % MIN_MATCH_COUNT, flush=True)
 
 # calculates the keypoints of an image using a certain algorithm
-def calculate_feature_points(image_path, algorithm_type, debug_bool):
-    debug_variable == debug_bool
+def calculate_feature_points(image_path, algorithm_type, debug_bool): 
     print('Calculating feature points for image %s' % image_path, flush=True)
     
     if algorithm_type == 'sift':
@@ -132,7 +130,7 @@ def calculate_feature_points(image_path, algorithm_type, debug_bool):
         # find the keypoints and descriptors with SIFT
         kp1, des1 = sift.detectAndCompute(img,None)
         
-        if debug_variable:
+        if debug_bool:
             print('kp %s desc %s ' % (len(kp1),len(des1)) ,flush=True)
         
         return img, kp1, des1
@@ -143,7 +141,7 @@ def calculate_feature_points(image_path, algorithm_type, debug_bool):
         img = cv2.imread(image_path,cv2.IMREAD_GRAYSCALE) # queryImage
         # Create SURF object. You can specify params here or later.
         # Here I set Hessian Threshold to 400
-        if debug_variable:
+        if debug_bool:
             print('Hessian Threshold = 400',flush=True)
         
         surf = cv2.xfeatures2d.SURF_create(400)
@@ -155,7 +153,7 @@ def calculate_feature_points(image_path, algorithm_type, debug_bool):
         """
         # Find keypoints and descriptors directly
         kp, des = surf.detectAndCompute(img,None)
-        if debug_variable:
+        if debug_bool:
             print('kp %s desc %s ' % (len(kp),len(des)) ,flush=True)
 
         return img, kp, des

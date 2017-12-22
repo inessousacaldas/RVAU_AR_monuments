@@ -38,11 +38,11 @@ def image_test(image_test, database_images, algorithm_type, ransac_value, debug_
 
     database_image = [database_images[0][index_max], database_images[1][index_max], database_images[2][index_max]]
     
-    compute_homography(image_test, image, database_image, layerAR, matches[index_max], ransac_value)
+    compute_homography(image_test, image, database_image, layerAR, matches[index_max], ransac_value, debug_bool)
 
 # compute the test image and show the findings 
-# args : the image path, the algorithm name ('sift' or 'surf') and the ransac value (float)
-# arAppCompute('..\database\images\c\img1_01.jpg', 'surf', 0.6) 
+# args : the image path, the algorithm name ('sift' or 'surf'), the ransac value (float) and debug (true or false)
+# arAppCompute('..\database\images\img1.jpg', 'surf', 0.6, False) 
 def arAppCompute(image_test_path, algorithm_type, ransac_value, debug_bool):
     images_cv, feature_points, descriptors = load_fileImages_database(algorithm_type)
     database_images = [images_cv, feature_points, descriptors]
@@ -61,4 +61,4 @@ def main():
 if __name__== "__main__":
     main()
 """
-arAppCompute('..\database\images\img1.jpg', 'surf', 0.6, False) 
+#arAppCompute('..\database\images\img1.jpg', 'surf', 0.6, False) 
