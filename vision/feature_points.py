@@ -73,8 +73,7 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
             print(layerAR_img.shape, flush=True)
             print(src.shape, flush=True)
             
-        src_gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
-        merge = cv2.addWeighted(layerAR_img,0.5,src_gray,0.5,0)
+        merge = blend_transparent(src, coloredLayerAr)
         merge_final = blend_transparent(dst_rgb, result)
 
         if debug_bool:

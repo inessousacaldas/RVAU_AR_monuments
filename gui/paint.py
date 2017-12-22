@@ -42,7 +42,7 @@ PROGRAM_TITLE = "MonumentAR"
 CONFIGURATION_FILE = PROGRAM_TITLE+".ini"
 
 #Default configuration
-C_DATA = [[1150, 768],"#000000","#FFFFFF","#FFFFFF",[5,5,[1,1],0,"miter"],2,3,"EN"]
+C_DATA = [[1048, 768],"#000000","#FFFFFF","#FFFFFF",[5,5,[1,1],0,"miter"],2,3,"EN"]
 
 #Load Settings and Update C_DATA
 try:
@@ -244,8 +244,8 @@ class Paint:
 
             windowFrame2.lower()
             
-            self.screen = Canvas(windowFrame,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=palette.CANVAS_COLOR)
-            self.screenSave = Canvas(windowFrame2,width=PROGRAM_SIZE[0]*0.8, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND, relief="sunken")
+            self.screen = Canvas(windowFrame,width=PROGRAM_SIZE[0]*0.7815, height=PROGRAM_SIZE[1],bg=palette.CANVAS_COLOR)
+            self.screenSave = Canvas(windowFrame2,width=PROGRAM_SIZE[0]*0.7815, height=PROGRAM_SIZE[1],bg=DEFAULT_BACKGROUND, relief="sunken")
             self.screen.grid()
             self.screenSave.grid()
 
@@ -288,8 +288,6 @@ class Paint:
             image_text = ImageTk.PhotoImage(image_text)
             b_text.config(image=image_text)
             b_text.pack(side=LEFT)
-
-            #ttk.Button(Buttonframe,text="Brush",width=20,command=lambda:self.tools("brush"), style="TButton").pack()
                           
             #Insert Figures
             FiguresInsert = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
@@ -382,6 +380,14 @@ class Paint:
             ttk.Button(Buttonframe,text="SURF",width=20,command=lambda:self.arApp('surf')).pack()
             ttk.Button(Buttonframe,text="Database",width=20,command=self.seeDatabase).pack()
 
+            label = Label(Buttonframe,text="",border=10, bg = palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY)
+            label.config(font=("Courier", 5, 'bold'))
+            label.pack()
+
+            self.ransac_value = Scale(Buttonframe, from_=0, to=50, label='Ransac Threshold', width=20, resolution=0.1, orient=HORIZONTAL, bg=palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY)
+            self.ransac_value.pack(fill=BOTH)
+            self.ransac_value.set(0.6)
+
             #Info for user
             Label(Buttonframe,height=1, background=palette.CANVAS_COLOR).pack()
             self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=5,justify=CENTER,wraplength=125, background=palette.CANVAS_COLOR)
@@ -390,7 +396,7 @@ class Paint:
 
             #Debug
             self.debug = BooleanVar()
-            c = Checkbutton(Buttonframe, text="Debug", variable=self.debug, bg = palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY, command=self.changeDebugMode)
+            c = Checkbutton(Buttonframe, text="Debug", selectcolor=palette.CANVAS_COLOR, variable=self.debug, bg = palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY, command=self.changeDebugMode)
             c.pack(side=RIGHT)
             c.var = self.debug
 
@@ -501,7 +507,7 @@ class Paint:
                 self.screenSave.postscript(file=filename, colormode='color',  height = 770, pagewidth=819)
 
                 img = Image.open(filename)
-                print(img.size, flush=True)
+                print('size ', img.size, flush=True)
                 self.saveLayer(img)
                 img.save(DATASAVES+str(txt.value) + '.png', 'png')
                 self.draw = False
@@ -682,8 +688,8 @@ class Paint:
             images = Image.open(filepath)
             images = images.resize((64,64), Image.ANTIALIAS)
             images = ImageTk.PhotoImage(images)
-            im = self.screen.create_image(PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="token", state=NORMAL)
-            imSave = self.screenSave.create_image(PROGRAM_SIZE[0]*0.8/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="token", state=NORMAL)
+            im = self.screen.create_image(PROGRAM_SIZE[0]*0.7815/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="token", state=NORMAL)
+            imSave = self.screenSave.create_image(PROGRAM_SIZE[0]*0.7815/2, PROGRAM_SIZE[1]/2, image=images, anchor=CENTER,tags="token", state=NORMAL)
             self.stackElements.append(im)
             self.stackElementsSave.append(imSave)
             mainloop()
@@ -734,7 +740,7 @@ class Paint:
             filename, file_extension = os.path.splitext(filepath)
 
             image = Image.open(filepath)                
-            image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
+            image = image.resize((int(PROGRAM_SIZE[0]*0.7815), PROGRAM_SIZE[1]), Image.ANTIALIAS)
             name = DATABASE_PATH + 'img' + str(self.sizeDatabase) + file_extension
             image.save(name)
             self.imageBackgroundPath = name
@@ -759,7 +765,7 @@ class Paint:
             img.save(DATASAVES+'temp' + '.png', 'png')
 
             #Calculates default keypoints and descriptors
-            keypoints_default(self.imageBackgroundPath)
+            keypoints_default(self.imageBackgroundPath, self.debug.get())
 
 
             self.main.mainloop()
@@ -778,7 +784,7 @@ class Paint:
         index = basename(filename).replace('img', '')
        
         image = Image.open(filepath)                
-        image = image.resize((int(PROGRAM_SIZE[0]*0.8), PROGRAM_SIZE[1]), Image.ANTIALIAS)
+        image = image.resize((int(PROGRAM_SIZE[0]*0.7815), PROGRAM_SIZE[1]), Image.ANTIALIAS)
         self.imageBackgroundPath = filepath
         self.layerName = 'img' + str(index)
         image = ImageTk.PhotoImage(image)
@@ -836,16 +842,15 @@ class Paint:
             #TODO add popup
             print("Select image first.")
         else:
-            select_region(self.imageBackgroundPath)
+            select_region(self.imageBackgroundPath, self.debug.get())
 
     def arApp(self, algorithm):
-        print("ArAPP", flush=True)
         filepath = askopenfilename(title="Open",initialdir=TEST_PATH,defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
         self.messageUser.config(text="")
         #if filepath!="" and (filepath[len(filepath)-4:len(filepath)]==".jpg" or filepath[len(filepath)-4:len(filepath)]==".gif"):
         if filepath!="":
             print(filepath, flush=True)
-            arAppCompute(filepath, algorithm, 0.6)
+            arAppCompute(filepath, algorithm, self.ransac_value.get(), self.debug.get())
 
     def changeDebugMode(self):
         if(self.debug.get()):

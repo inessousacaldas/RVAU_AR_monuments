@@ -38,7 +38,7 @@ def calculate_matches(image_des, database_des):
 
 # Computes the homography between the test image and the image with the higher number of best matches
 # Shows the findings with the correct homography
-def compute_homography(test_image_path, test_image, database_image, layerAR, matches,ransac_value):
+def compute_homography(test_image_path, test_image, database_image, layerAR, matches,ransac_value,debug_bool):
 
     #kp_database_image/test_image = [img, kp, des]
     layerAR_img = cv2.imread(layerAR, 0)
@@ -48,10 +48,7 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
     #Images openCV
     src = database_image[0]
     dst = test_image[0]
-    cv2.namedWindow('s', cv2.WINDOW_KEEPRATIO)
-    cv2.resizeWindow('s', 300, 300)
-    cv2.imshow('s',layerAR_img)
-    cv2.waitKey(0)
+    
     #Keypoints
     kp_database_image = database_image[1]
     kp_test_image = test_image[1]
@@ -72,36 +69,37 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
         result = cv2.warpPerspective(coloredLayerAr, M,(w,h))
     
         # show findings
-        print(layerAR_img.shape, flush=True)
-        print(src.shape, flush=True)
-        src_gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
-        print(layerAR_img.shape, flush=True)
-        print(src.shape, flush=True)
-        merge = cv2.addWeighted(layerAR_img,0.5,src_gray,0.5,0)
-        
+        if debug_bool:
+            print(layerAR_img.shape, flush=True)
+            print(src.shape, flush=True)
+            
+        merge = blend_transparent(src, coloredLayerAr)
         merge_final = blend_transparent(dst_rgb, result)
 
-        cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
-        cv2.resizeWindow('res', 300, 300)
-        cv2.imshow('res',result)
+        if debug_bool:
+            cv2.namedWindow('res', cv2.WINDOW_KEEPRATIO)
+            cv2.resizeWindow('res', 300, 300)
+            cv2.imshow('res',result)
+           
+            cv2.namedWindow('ori', cv2.WINDOW_KEEPRATIO)
+            cv2.resizeWindow('ori', 300, 300)
+            cv2.imshow('ori', dst)
+    
+            cv2.namedWindow('test', cv2.WINDOW_KEEPRATIO)
+            cv2.resizeWindow('test', 300, 300)
+            cv2.imshow('test', src)
 
-    
-        cv2.namedWindow('merge_ori', cv2.WINDOW_KEEPRATIO)
-        cv2.resizeWindow('merge_ori', 300, 300)
-        cv2.imshow('merge_ori',merge)
-    
+            cv2.namedWindow('layer', cv2.WINDOW_KEEPRATIO)
+            cv2.resizeWindow('layer', 300, 300)
+            cv2.imshow('layer',layerAR_img)
 
         cv2.namedWindow('merge', cv2.WINDOW_KEEPRATIO)
         cv2.resizeWindow('merge', 300, 300)
         cv2.imshow('merge',merge_final)
 
-        cv2.namedWindow('ori', cv2.WINDOW_KEEPRATIO)
-        cv2.resizeWindow('ori', 300, 300)
-        cv2.imshow('ori', dst)
-
-        cv2.namedWindow('test', cv2.WINDOW_KEEPRATIO)
-        cv2.resizeWindow('test', 300, 300)
-        cv2.imshow('test', src)
+        cv2.namedWindow('merge_ori', cv2.WINDOW_KEEPRATIO)
+        cv2.resizeWindow('merge_ori', 300, 300)
+        cv2.imshow('merge_ori',merge)
 
         # Draw best matches on the screen
         draw_params = dict(matchColor = (0,255,0), # draw matches in green color
@@ -112,15 +110,13 @@ def compute_homography(test_image_path, test_image, database_image, layerAR, mat
         img3 = cv2.drawMatches(src,kp_database_image,dst,kp_test_image,matches,None,**draw_params)
 
         plt.imshow(img3, 'gray'),plt.show()
-        cv2.waitKey(0)
         cv2.destroyAllWindows()
     
     else:
         print('The minimum of %s matches was not reached. Please try it agin later...' % MIN_MATCH_COUNT, flush=True)
 
 # calculates the keypoints of an image using a certain algorithm
-def calculate_feature_points(image_path, algorithm_type):
-    
+def calculate_feature_points(image_path, algorithm_type, debug_bool): 
     print('Calculating feature points for image %s' % image_path, flush=True)
     
     if algorithm_type == 'sift':
@@ -132,7 +128,10 @@ def calculate_feature_points(image_path, algorithm_type):
     
         # find the keypoints and descriptors with SIFT
         kp1, des1 = sift.detectAndCompute(img,None)
-        print('kp %s desc %s ' % (len(kp1),len(des1)) ,flush=True)
+        
+        if debug_bool:
+            print('kp %s desc %s ' % (len(kp1),len(des1)) ,flush=True)
+        
         return img, kp1, des1
 
     elif algorithm_type == 'surf':
@@ -141,7 +140,9 @@ def calculate_feature_points(image_path, algorithm_type):
         img = cv2.imread(image_path,cv2.IMREAD_GRAYSCALE) # queryImage
         # Create SURF object. You can specify params here or later.
         # Here I set Hessian Threshold to 400
-        print('Hessian Threshold = 400',flush=True)
+        if debug_bool:
+            print('Hessian Threshold = 400',flush=True)
+        
         surf = cv2.xfeatures2d.SURF_create(400)
         """
         Hessian threshold is related to the number of keypoints and descriptores found
@@ -151,7 +152,9 @@ def calculate_feature_points(image_path, algorithm_type):
         """
         # Find keypoints and descriptors directly
         kp, des = surf.detectAndCompute(img,None)
-        print('kp %s desc %s ' % (len(kp),len(des)) ,flush=True)
+        if debug_bool:
+            print('kp %s desc %s ' % (len(kp),len(des)) ,flush=True)
+
         return img, kp, des
 
 
