@@ -208,6 +208,8 @@ class Paint:
             insertMenu.add_command(label="Oval",command= lambda: self.createFigure("oval"))
             insertMenu.add_command(label="Line",command= lambda: self.createFigure("line"))
             insertMenu.add_command(label="Text",command= lambda: self.createFigure("text"))
+            insertMenu.add_command(label="Icon",command=lambda: self.insertIcons())
+            
             menuBar.add_cascade(label="Insert",menu=insertMenu)
 
             #Tools
@@ -325,21 +327,28 @@ class Paint:
             label = Label(Buttonframe,text="Settings",border=10, background=palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY)
             label.config(font=("Courier", 18, 'bold'))
             label.pack()
-            WeightPencil = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
+            WeightPencil = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW, width=32, height=32)
             WeightPencil.pack()
-            self.infoWeightPencil = Label(WeightPencil,text=str(self.toolWeight),border=3,font=10,width=2)
+            self.infoWeightPencil = Label(WeightPencil,relief='groove' ,text=str(self.toolWeight),border=3,font=10,width=3, background=palette.CANVAS_COLOR, fg=palette.LIGHT_GRAY)
+            self.infoWeightPencil.config(height=2, width=3)
             self.infoWeightPencil.pack(side=LEFT)
-            Label(WeightPencil,text="  ").pack(side=LEFT)
-            ttk.Button(WeightPencil,text="Weight",command=self.toolWeightChange,width=9).pack()
+            
+            
+            b_weight = ttk.Button(WeightPencil,text="Weight",command=self.toolWeightChange,width=2)
+            image_weight = Image.open(DATAICONS + "weight.png")
+            image_weight = image_weight.resize((32,32), Image.ANTIALIAS)
+            image_weight = ImageTk.PhotoImage(image_weight)
+            b_weight.config(image=image_weight)
+            b_weight.pack()
+            
             
             #Color Information
-            Label(Buttonframe,text="Colors",border=10).pack()
             activeColor = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             activeColor.pack()
-            self.infoactivedcolor = Canvas(activeColor,width=30,height=32,bg=self.activeColor)
+            self.infoactivedcolor = Canvas(activeColor,width=32,height=32,bg=self.activeColor)
             self.infoactivedcolor.pack(side=LEFT)
             
-            b_color = ttk.Button(activeColor,text="Color 1",command=lambda:self.colorChange("active"),width=10)
+            b_color = ttk.Button(activeColor,text="Color 1",command=lambda:self.colorChange("active"),width=32)
             image_color = Image.open(DATAICONS + "paint.png")
             image_color = image_color.resize((32,32), Image.ANTIALIAS)
             image_color = ImageTk.PhotoImage(image_color)
@@ -348,7 +357,7 @@ class Paint:
 
             activeColor = Frame(Buttonframe, background=palette.BACKGROUND_WINDOW)
             activeColor.pack()
-            self.infoactivedbackgroundcolor = Canvas(activeColor,width=30,height=32,bg=self.backgroundColor)
+            self.infoactivedbackgroundcolor = Canvas(activeColor,width=32,height=32,bg=self.backgroundColor)
             self.infoactivedbackgroundcolor.pack(side=LEFT)
             
             b_colorBucket = ttk.Button(activeColor,text="Color 2",command=lambda:self.colorChange("background"),width=10)
@@ -377,7 +386,13 @@ class Paint:
             Label(Buttonframe,height=1, background=palette.CANVAS_COLOR).pack()
             self.messageUser = Label(Buttonframe,text="",relief=GROOVE,width=30,height=5,justify=CENTER,wraplength=125, background=palette.CANVAS_COLOR)
             self.messageUser.config(fg=palette.LIGHT_GRAY)
-            self.messageUser.pack(side=BOTTOM)
+            self.messageUser.pack()
+
+            #Debug
+            self.debug = BooleanVar()
+            c = Checkbutton(Buttonframe, text="Debug", variable=self.debug, bg = palette.BACKGROUND_WINDOW, fg=palette.LIGHT_GRAY, command=self.changeDebugMode)
+            c.pack(side=RIGHT)
+            c.var = self.debug
 
             # add bindings for clicking, dragging and releasing over
             # any object with the "token" tag
@@ -708,6 +723,7 @@ class Paint:
     #Vision
 
     def addImageDatabase(self):
+        print('debug', self.debug, flush=True)
         self.messageUser.config(text="Enter the location of your image.")
         filepath = askopenfilename(title="Open",initialdir="./",defaultextension=".jpg",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
         self.messageUser.config(text="")
@@ -831,6 +847,12 @@ class Paint:
             print(filepath, flush=True)
             arAppCompute(filepath, algorithm, 0.6)
 
+    def changeDebugMode(self):
+        if(self.debug.get()):
+            print('Debug mode activated.', flush=True)
+        else:
+            print('Debug mode deactivated.', flush=True)
+        
 
 #Run class Paint
 Paint()
