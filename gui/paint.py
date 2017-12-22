@@ -574,8 +574,7 @@ class Paint:
         txt = pyv("Write text",DATAICONS+"text.ico","inserttext",(250,110))
         txt.root.mainloop(1)
         self.messageUser.config(text="")
-        print('wie', self.toolWeight, flush=True)
-        _font = tkFont.Font(font="Helvetica", size = 40, weight='bold')
+        _font = tkFont.Font(size = self.toolWeight + 10, weight='bold')
         _obj = self.screen.create_text(event.x,event.y, text=txt.value,font = _font, fill=self.activeColor,activefill='red', justify=tk.CENTER, tags='token')
         _objSave = self.screenSave.create_text(event.x,event.y, text=txt.value,font = _font, fill=self.activeColor,activefill='red', justify=tk.CENTER, tags='token')
         
