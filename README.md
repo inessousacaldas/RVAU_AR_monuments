@@ -27,7 +27,7 @@ ghostscript --> Ghostscript 9.22 for Windows --> (https://www.ghostscript.com/do
 ```
 
 
-After the python environment has been created with the remaining dependencies of the application, the user must access the scriptWin.bat or scriptUnix.sh file, depending on his operating system, which is in the Ar_monuments / gui folder.
+After the python environment has been created with the remaining dependencies of the application, the user must access the *scriptWin.bat* or *scriptUnix.sh* file, depending on his operating system, which is in the *Ar_monuments/gui* folder.
 
 
 ----------------------
