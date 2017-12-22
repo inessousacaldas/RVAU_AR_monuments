@@ -27,7 +27,7 @@ def get_number_of_files():
 
     return len(files)
     
-
+# Gets the database image name at index
 def get_image_layerAR(index):
 
     image_list = []
@@ -42,6 +42,7 @@ def get_image_layerAR(index):
 
     return layer_filename
 
+# makes a mask using the two images
 def blend_transparent(face_img, overlay_t_img):
     # Split out the transparency mask from the colour info
     overlay_img = overlay_t_img[:,:,:3] # Grab the BRG planes
@@ -62,6 +63,7 @@ def blend_transparent(face_img, overlay_t_img):
     # And finally just add them together, and rescale it back to an 8bit integer image    
     return np.uint8(cv2.addWeighted(face_part, 255.0, overlay_part, 255.0, 0.0))
 
+# convertes keypoint into a byte stream
 def pickle_keypoints(keypoints):
     temp_array = []
     for point in keypoints:
@@ -70,8 +72,8 @@ def pickle_keypoints(keypoints):
         temp_array.append(temp)
     return temp_array
 
+# the byte stream is converted back into an object hierarchy.
 def unpickle_keypoints(point):
-
     temp_feature = cv2.KeyPoint(x=point[0][0],y=point[0][1],_size=point[1], _angle=point[2], _response=point[3], _octave=point[4], _class_id=point[5])
   
     return temp_feature
