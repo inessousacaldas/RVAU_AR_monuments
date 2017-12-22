@@ -148,9 +148,7 @@ def click_and_delete(event, x, y, flags, param):
     global descriptors
     kp = param[0]
 
-    if event == cv2.EVENT_LBUTTONDOWN:
-        print(x, y, flush=True)
-        
+    if event == cv2.EVENT_LBUTTONDOWN:     
         for n in range(len(kp)):
             center_x = kp[n].pt[0]
             center_y = kp[n].pt[1]
